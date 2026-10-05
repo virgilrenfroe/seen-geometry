@@ -14,14 +14,16 @@ An educator directed AI agents to build these pages. The author is not a softwar
 | [01 Instanced field](demos/01-instanced-field.html) | One box, many matrices, one draw call. Tap a block and read its matrix. |
 | [02 Morph targets](demos/02-morph-targets.html) | Two blend shapes, spike and squash, added with sliders. |
 | [03 Order of transforms](demos/03-compose-transforms.html) | The same translate, rotate, and scale, multiplied in three orders. |
+| [04 Point vs direction](demos/04-point-vs-direction.html) | One arrow as a point (w = 1) and as a direction (w = 0). Translation moves only the point. |
 
-On a wide screen, demo 03 can show all three orders at once. The tail positions are listed either way.
+On a wide screen, demo 03 can show all three orders at once. The tail positions are listed either way. Demo 04 can show the point and the direction side by side.
 
 A useful order for a class:
 
 1. In demo 01, orbit the camera and notice the matrix of a selected block does not change. Then tap a different block.
 2. In demo 02, set one slider to 0 and sweep the other. Then let both sit in the middle.
 3. In demo 03, sweep the rotation while watching the dark origin dot. With `T · R · S`, the tail stays on the X axis. The other products move the tail off that axis.
+4. In demo 04, sweep translate X. The point arrow’s tip moves. The direction arrow, w = 0, stays on the origin. Then add a little rotation and watch both arrows turn.
 
 ## Run locally
 
@@ -37,9 +39,7 @@ Any static server is fine. The requirement is `http://`, not `file://`.
 
 ## GitHub Pages
 
-Pages is enabled from the `main` branch at the repository root. The address is [https://virgilrenfroe.github.io/seen-geometry/](https://virgilrenfroe.github.io/seen-geometry/).
-
-The first build can sit in `building` for a while. Until it finishes, that address returns 404. `.nojekyll` is in the root so Pages serves the HTML as written.
+Pages is live from the `main` branch at the repository root: [https://virgilrenfroe.github.io/seen-geometry/](https://virgilrenfroe.github.io/seen-geometry/). `.nojekyll` is in the root so Pages serves the HTML as written.
 
 ## Railway
 

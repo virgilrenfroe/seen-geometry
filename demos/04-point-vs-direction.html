@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Point vs direction — Seen Geometry</title>
+  <meta name="description" content="The same arrow as a point (w = 1) and as a direction (w = 0). Translation moves only the point.">
+  <meta name="theme-color" content="#f3eee6">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">04 · Homogeneous w</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="Two copies of one arrow. The point moves when translated. The direction does not."></canvas>
+    <div class="stamps" id="stamps">
+      <p data-kind="point" id="stamp-point">Point · w = 1</p>
+      <p data-kind="dir" id="stamp-dir">Direction · w = 0</p>
+    </div>
+  </div>
+  <section class="dock" aria-label="Homogeneous coordinates">
+    <p class="index-no">04</p>
+    <h1>Point or direction</h1>
+    <p class="lede">One arrow, one matrix. The point has w = 1, so translation moves the tip. The direction has w = 0, so the same translation leaves it where it is.</p>
+    <div class="orders" role="group" aria-label="Which arrow to show">
+      <button type="button" data-focus="point" aria-pressed="false">Point w = 1</button>
+      <button type="button" data-focus="dir" aria-pressed="false">Direction w = 0</button>
+      <button type="button" data-focus="both" aria-pressed="true">Both</button>
+    </div>
+    <p class="fine" id="both-note" hidden>Side by side needs a wider window. The vectors below still compare both.</p>
+    <p>Read the product from right to left. Rotation touches the arrow first. Translation is the last column, and it is multiplied by w.</p>
+    <pre class="factors" id="factors"></pre>
+    <label class="field">
+      <span>Translate X <output id="tx-out">1.15</output></span>
+      <input id="tx" type="range" min="-1.2" max="1.5" step="0.01" value="1.15">
+    </label>
+    <label class="field">
+      <span>Translate Y <output id="ty-out">0.45</output></span>
+      <input id="ty" type="range" min="-1" max="1.2" step="0.01" value="0.45">
+    </label>
+    <label class="field">
+      <span>Rotate Z <output id="deg-out">28°</output></span>
+      <input id="deg" type="range" min="-35" max="55" step="1" value="28">
+    </label>
+    <ul class="tails">
+      <li data-kind="point"><span class="swatch clay"></span><span>w = 1</span><span id="point-out"></span></li>
+      <li data-kind="dir"><span class="swatch navy"></span><span>w = 0</span><span id="dir-out"></span></li>
+    </ul>
+    <p class="fine">The signal column is the translation. A point adds it. A direction multiplies it by zero. Rotation still turns both arrows. The dark dot is the origin of that picture.</p>
+    <table class="matrix" id="matrix">
+      <caption>The same 4×4 for both arrows. Rows run left to right.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="next"><a href="03-compose-transforms.html">Order of transforms</a> · <a href="../index.html">Hub</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Archive">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html" aria-current="page">04 Point vs direction</a>
+      <a href="../index.html">Index</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Index</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. This page loads three.js r170 from unpkg.com and needs a network connection.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const txInput = document.getElementById('tx');
+    const tyInput = document.getElementById('ty');
+    const degInput = document.getElementById('deg');
+    const bothNote = document.getElementById('both-note');
+    const factors = document.getElementById('factors');
+    const pointOut = document.getElementById('point-out');
+    const dirOut = document.getElementById('dir-out');
+    const stampPoint = document.getElementById('stamp-point');
+    const stampDir = document.getElementById('stamp-dir');
+    const matrixTable = document.getElementById('matrix');
+    const buttons = Array.from(document.querySelectorAll('.orders button'));
+
+    const LENGTH = 1.32;
+    const SHAFT = 0.86;
+    const SHAFT_HALF = 0.14;
+    const HEAD_HALF = 0.36;
+    const TIP = new THREE.Vector4(LENGTH, 0, 0, 1);
+
+    let focus = 'both';
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function makeArrowGeometry() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, SHAFT_HALF);
+      shape.lineTo(SHAFT, SHAFT_HALF);
+      shape.lineTo(SHAFT, HEAD_HALF);
+      shape.lineTo(LENGTH, 0);
+      shape.lineTo(SHAFT, -HEAD_HALF);
+      shape.lineTo(SHAFT, -SHAFT_HALF);
+      shape.lineTo(0, -SHAFT_HALF);
+      shape.closePath();
+      const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.16, bevelEnabled: false });
+      geometry.translate(0, 0, -0.08);
+      return geometry;
+    }
+
+    function multiplyVector(matrix, x, y, z, w) {
+      const e = matrix.elements;
+      return [
+        e[0] * x + e[4] * y + e[8] * z + e[12] * w,
+        e[1] * x + e[5] * y + e[9] * z + e[13] * w,
+        e[2] * x + e[6] * y + e[10] * z + e[14] * w,
+        e[3] * x + e[7] * y + e[11] * z + e[15] * w
+      ];
+    }
+
+    function format4(values) {
+      return values.map((value) => value.toFixed(2).padStart(6)).join('  ');
+    }
+
+    function fillMatrix(matrix) {
+      const elements = matrix.elements;
+      const body = matrixTable.tBodies[0];
+      for (let row = 0; row < 4; row += 1) {
+        for (let col = 0; col < 4; col += 1) {
+          body.rows[row].cells[col].textContent = elements[col * 4 + row].toFixed(2);
+        }
+      }
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf3eee6);
+      const camera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 40);
+      camera.position.set(0, 0, 12);
+      camera.lookAt(0, 0, 0);
+
+      const geometry = makeArrowGeometry();
+      const dotGeometry = new THREE.SphereGeometry(0.07, 16, 12);
+
+      function makeSlot(color) {
+        const pivot = new THREE.Group();
+        const grid = new THREE.GridHelper(6, 6, 0xb7ad9f, 0xddd6cb);
+        grid.rotation.x = Math.PI / 2;
+        const dot = new THREE.Mesh(dotGeometry, new THREE.MeshBasicMaterial({ color: 0x141210 }));
+        dot.position.z = 0.16;
+        const arrow = new THREE.Mesh(
+          geometry,
+          new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })
+        );
+        arrow.matrixAutoUpdate = false;
+        pivot.add(grid, dot, arrow);
+        scene.add(pivot);
+        return { pivot, arrow };
+      }
+
+      const point = makeSlot(0xff3d1a);
+      const direction = makeSlot(0x243e66);
+      scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+      function wideEnough() {
+        return window.innerWidth >= 980;
+      }
+
+      function layout() {
+        const wide = wideEnough();
+        const bothButton = buttons.find((button) => button.dataset.focus === 'both');
+        bothButton.disabled = !wide;
+        bothNote.hidden = wide;
+        if (!wide && focus === 'both') focus = 'point';
+        const showBoth = focus === 'both';
+        point.pivot.visible = showBoth || focus === 'point';
+        direction.pivot.visible = showBoth || focus === 'dir';
+        stampPoint.hidden = !point.pivot.visible;
+        stampDir.hidden = !direction.pivot.visible;
+        if (showBoth) {
+          point.pivot.position.set(-3.15, 0, 0);
+          direction.pivot.position.set(3.15, 0, 0);
+          point.pivot.scale.setScalar(0.6);
+          direction.pivot.scale.setScalar(0.6);
+        } else {
+          point.pivot.position.set(0, 0, 0);
+          direction.pivot.position.set(0, 0, 0);
+          point.pivot.scale.setScalar(1);
+          direction.pivot.scale.setScalar(1);
+        }
+        buttons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.focus === focus));
+        });
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        const aspect = width / height;
+        const showBoth = focus === 'both';
+        const minW = showBoth ? 5.2 : 3.45;
+        const minH = showBoth ? 2.35 : 3.45;
+        let halfW = minW;
+        let halfH = minH;
+        if (halfW / halfH < aspect) halfW = halfH * aspect;
+        else halfH = halfW / aspect;
+        camera.left = -halfW;
+        camera.right = halfW;
+        camera.top = halfH;
+        camera.bottom = -halfH;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function sync() {
+        const tx = Number(txInput.value);
+        const ty = Number(tyInput.value);
+        const degrees = Number(degInput.value);
+        document.getElementById('tx-out').textContent = tx.toFixed(2);
+        document.getElementById('ty-out').textContent = ty.toFixed(2);
+        document.getElementById('deg-out').textContent = degrees.toFixed(0) + '°';
+
+        const translation = new THREE.Matrix4().makeTranslation(tx, ty, 0);
+        const rotation = new THREE.Matrix4().makeRotationZ(THREE.MathUtils.degToRad(degrees));
+        const matrix = new THREE.Matrix4().copy(translation).multiply(rotation);
+        const linear = matrix.clone();
+        linear.elements[12] = 0;
+        linear.elements[13] = 0;
+        linear.elements[14] = 0;
+
+        point.arrow.matrix.copy(matrix);
+        point.arrow.matrixWorldNeedsUpdate = true;
+        direction.arrow.matrix.copy(linear);
+        direction.arrow.matrixWorldNeedsUpdate = true;
+
+        const pointResult = multiplyVector(matrix, TIP.x, TIP.y, TIP.z, 1);
+        const directionResult = multiplyVector(matrix, TIP.x, TIP.y, TIP.z, 0);
+        factors.textContent =
+          'M = translate · rotateZ\n' +
+          'point in      ' + format4([TIP.x, TIP.y, TIP.z, 1]) + '\n' +
+          'point out     ' + format4(pointResult) + '\n' +
+          'direction in  ' + format4([TIP.x, TIP.y, TIP.z, 0]) + '\n' +
+          'direction out ' + format4(directionResult);
+        pointOut.textContent = format4(pointResult);
+        dirOut.textContent = format4(directionResult);
+        fillMatrix(matrix);
+        layout();
+        frame();
+        renderer.render(scene, camera);
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          if (button.disabled) return;
+          focus = button.dataset.focus;
+          sync();
+        });
+      });
+      [txInput, tyInput, degInput].forEach((input) => input.addEventListener('input', sync));
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+
+      function loop() {
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+      }
+      loop();
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('WebGL did not start in this browser. ' + error.message);
+    }
+  </script>
+</body>
+</html>
