@@ -9,15 +9,23 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,720&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/studio.css">
 </head>
-<body class="hub">
-  <main class="sheet">
-    <p class="eyebrow">A classroom for transforms</p>
-    <h1>Seen Geometry</h1>
-    <p class="deck">Short WebGL pictures so a student can see what a matrix does. One idea on each page. The picture is the explanation.</p>
-    <ol class="toc">
+<body class="hub" data-view="list">
+  <p class="spine">Seen Geometry archive</p>
+  <header class="mast">
+    <h1><span>Seen</span><span class="shift">Geometry</span></h1>
+    <p class="deck">Three pictures. A matrix you can point at. Browse the archive as a list, a gallery, a loop, or a spiral.</p>
+  </header>
+  <div class="modes" role="group" aria-label="How to browse the archive">
+    <button type="button" data-view="list" aria-pressed="true">List</button>
+    <button type="button" data-view="gallery" aria-pressed="false">Gallery</button>
+    <button type="button" data-view="loop" aria-pressed="false">Loop</button>
+    <button type="button" data-view="spiral" aria-pressed="false">Spiral</button>
+  </div>
+  <div class="reel" id="reel">
+    <ol class="index" id="index">
       <li>
         <a href="demos/01-instanced-field.html">
           <span class="num">01</span>
@@ -46,8 +54,34 @@
         </a>
       </li>
     </ol>
-    <p class="fine">Pages address, after a repository admin enables Pages from the <code>main</code> branch at the root: <a href="https://virgilrenfroe.github.io/seen-geometry/">virgilrenfroe.github.io/seen-geometry</a>. On your computer, run <code>python3 -m http.server 8080</code> in this folder and open the hub in a browser. The modules do not load from a <code>file://</code> address.</p>
-    <p class="fine">An educator directed AI agents to make these pages. The author is not a software engineer and does not hold a mathematics appointment. Notes live in the <a href="https://github.com/virgilrenfroe/seen-geometry">README</a>.</p>
-  </main>
+  </div>
+  <footer class="colophon">
+    <p>Pages address, while the first GitHub Pages build finishes: <a href="https://virgilrenfroe.github.io/seen-geometry/">virgilrenfroe.github.io/seen-geometry</a>. On your computer, run <code>python3 -m http.server 8080</code> in this folder. The modules do not load from a <code>file://</code> address.</p>
+    <p>An educator directed AI agents to make these pages. The author is not a software engineer and does not hold a mathematics appointment. Notes live in the <a href="https://github.com/virgilrenfroe/seen-geometry">README</a>.</p>
+  </footer>
+  <script>
+    (function () {
+      var root = document.body;
+      var buttons = document.querySelectorAll('.modes button');
+      var reel = document.getElementById('reel');
+      var index = document.getElementById('index');
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduce && reel && index) {
+        var clone = index.cloneNode(true);
+        clone.removeAttribute('id');
+        clone.setAttribute('aria-hidden', 'true');
+        clone.querySelectorAll('a').forEach(function (link) { link.tabIndex = -1; });
+        reel.appendChild(clone);
+      }
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          root.setAttribute('data-view', button.getAttribute('data-view'));
+          buttons.forEach(function (item) {
+            item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+          });
+        });
+      });
+    }());
+  </script>
 </body>
 </html>

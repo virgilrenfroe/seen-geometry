@@ -37,11 +37,13 @@ Any static server is fine. The requirement is `http://`, not `file://`.
 
 ## GitHub Pages
 
-The site is ready to publish from the `main` branch at the repository root (`index.html` is the hub). The address is [https://virgilrenfroe.github.io/seen-geometry/](https://virgilrenfroe.github.io/seen-geometry/).
+Pages is enabled from the `main` branch at the repository root. The address is [https://virgilrenfroe.github.io/seen-geometry/](https://virgilrenfroe.github.io/seen-geometry/).
 
-That address is not serving yet. Enabling Pages needs repository administration. The token used to push this repo can update `main`, and GitHub rejected the Pages API with “Resource not accessible by integration” (it requires `pages=write` and `administration=write`).
+The first build can sit in `building` for a while. Until it finishes, that address returns 404. `.nojekyll` is in the root so Pages serves the HTML as written.
 
-A repository admin can turn it on in one step: **Settings → Pages → Build and deployment → Deploy from a branch → Branch `main`, folder `/ (root)` → Save.** `.nojekyll` is already in the root so Pages will serve the HTML as written.
+## Railway
+
+A root `Dockerfile` serves the same files with nginx. `railway.toml` tells Railway to build that image and check `/`.
 
 ## How the pictures are drawn
 

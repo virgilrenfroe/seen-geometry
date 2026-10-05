@@ -22,17 +22,16 @@
 </head>
 <body class="demo">
   <header class="top">
-    <div class="titleblock">
-      <a class="brand" href="../index.html">Seen Geometry</a>
-      <p class="eyebrow">02 · Morph targets</p>
-      <h1>Two blend shapes</h1>
-      <p class="lede">The base is a sphere. Spike and squash are other positions for the same vertices. A slider is a weight. Both weights can be on at once.</p>
-    </div>
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">02 · Morph targets</p>
   </header>
   <div class="stage" id="stage">
     <canvas id="canvas" aria-label="A clay sphere that can spike and squash."></canvas>
   </div>
   <section class="dock" aria-label="Blend weights">
+    <p class="index-no">02</p>
+    <h1>Two blend shapes</h1>
+    <p class="lede">The base is a sphere. Spike and squash are other positions for the same vertices. A slider is a weight. Both weights can be on at once.</p>
     <h2>Weights</h2>
     <p>At 0 you see the base sphere. At 1 that target is fully on. The weights are added. They do not have to sum to 1.</p>
     <label class="field">
@@ -51,6 +50,18 @@
     </div>
     <p class="next"><a href="01-instanced-field.html">Instanced field</a> · <a href="03-compose-transforms.html">Next: order of transforms</a></p>
   </section>
+  <nav class="reelbar" aria-label="Archive">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html" aria-current="page">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="../index.html">Index</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Index</a>
+    </div>
+  </nav>
   <p class="status" id="status">Loading the picture…</p>
   <script>
     window.setTimeout(function () {
