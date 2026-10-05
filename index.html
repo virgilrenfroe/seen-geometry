@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seen Geometry</title>
+  <meta name="description" content="Classroom WebGL pictures of geometric transforms: instancing, morph targets, and matrix order.">
+  <meta name="theme-color" content="#f3eee6">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/studio.css">
+</head>
+<body class="hub">
+  <main class="sheet">
+    <p class="eyebrow">A classroom for transforms</p>
+    <h1>Seen Geometry</h1>
+    <p class="deck">Short WebGL pictures so a student can see what a matrix does. One idea on each page. The picture is the explanation.</p>
+    <ol class="toc">
+      <li>
+        <a href="demos/01-instanced-field.html">
+          <span class="num">01</span>
+          <span>
+            <strong>Instanced field</strong>
+            <em>One box. Many matrices. One draw call.</em>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a href="demos/02-morph-targets.html">
+          <span class="num">02</span>
+          <span>
+            <strong>Morph targets</strong>
+            <em>Spike and squash, blended with two weights.</em>
+          </span>
+        </a>
+      </li>
+      <li>
+        <a href="demos/03-compose-transforms.html">
+          <span class="num">03</span>
+          <span>
+            <strong>Order of transforms</strong>
+            <em>Same translate, rotate, and scale. Three products.</em>
+          </span>
+        </a>
+      </li>
+    </ol>
+    <p class="fine">Live pages: <a href="https://virgilrenfroe.github.io/seen-geometry/">virgilrenfroe.github.io/seen-geometry</a>. On your computer, run <code>python3 -m http.server 8080</code> in this folder and open the hub in a browser. The modules do not load from a <code>file://</code> address.</p>
+    <p class="fine">An educator directed AI agents to make these pages. The author is not a software engineer and does not hold a mathematics appointment. Notes live in the <a href="https://github.com/virgilrenfroe/seen-geometry">README</a>.</p>
+  </main>
+</body>
+</html>

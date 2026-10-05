@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Morph targets — Seen Geometry</title>
+  <meta name="description" content="A sphere with two blend shapes: spike and squash. Sliders are weights added onto the base form.">
+  <meta name="theme-color" content="#f3eee6">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <div class="titleblock">
+      <a class="brand" href="../index.html">Seen Geometry</a>
+      <p class="eyebrow">02 · Morph targets</p>
+      <h1>Two blend shapes</h1>
+      <p class="lede">The base is a sphere. Spike and squash are other positions for the same vertices. A slider is a weight. Both weights can be on at once.</p>
+    </div>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="A clay sphere that can spike and squash."></canvas>
+  </div>
+  <section class="dock" aria-label="Blend weights">
+    <h2>Weights</h2>
+    <p>At 0 you see the base sphere. At 1 that target is fully on. The weights are added. They do not have to sum to 1.</p>
+    <label class="field">
+      <span>Spike <output id="spike-out">0.80</output></span>
+      <input id="spike" type="range" min="0" max="1" step="0.01" value="0.80">
+    </label>
+    <label class="field">
+      <span>Squash <output id="squash-out">0.00</output></span>
+      <input id="squash" type="range" min="0" max="1" step="0.01" value="0">
+    </label>
+    <label class="check"><input id="play" type="checkbox"> Play both weights</label>
+    <p class="fine" id="motion-note" hidden>Reduced motion is on, so Play starts off. The sliders still work.</p>
+    <div class="row">
+      <button type="button" class="quiet" id="base">Base only</button>
+      <button type="button" class="quiet" id="reset">Reset view</button>
+    </div>
+    <p class="next"><a href="01-instanced-field.html">Instanced field</a> · <a href="03-compose-transforms.html">Next: order of transforms</a></p>
+  </section>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. This page loads three.js r170 from unpkg.com and needs a network connection.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const narrow = window.matchMedia('(max-width: 760px)').matches;
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const spikeInput = document.getElementById('spike');
+    const squashInput = document.getElementById('squash');
+    const spikeOut = document.getElementById('spike-out');
+    const squashOut = document.getElementById('squash-out');
+    const playInput = document.getElementById('play');
+    const motionNote = document.getElementById('motion-note');
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function smooth01(t) {
+      const x = Math.min(1, Math.max(0, t));
+      return x * x * (3 - 2 * x);
+    }
+
+    function normalDeltas(geometry, absolutePositions) {
+      const morphGeo = new THREE.BufferGeometry();
+      morphGeo.setAttribute('position', new THREE.BufferAttribute(absolutePositions, 3));
+      if (geometry.index) morphGeo.setIndex(geometry.index.clone());
+      morphGeo.computeVertexNormals();
+      const target = morphGeo.attributes.normal.array;
+      const base = geometry.attributes.normal.array;
+      const delta = new Float32Array(base.length);
+      for (let i = 0; i < base.length; i += 1) delta[i] = target[i] - base[i];
+      morphGeo.dispose();
+      return new THREE.Float32BufferAttribute(delta, 3);
+    }
+
+    function addMorphs(geometry) {
+      const position = geometry.attributes.position;
+      const normal = geometry.attributes.normal;
+      const count = position.count;
+      const spikeAbsolute = new Float32Array(count * 3);
+      const squashAbsolute = new Float32Array(count * 3);
+      const spikeDelta = new Float32Array(count * 3);
+      const squashDelta = new Float32Array(count * 3);
+
+      for (let i = 0; i < count; i += 1) {
+        const x = position.getX(i);
+        const y = position.getY(i);
+        const z = position.getZ(i);
+        const nx = normal.getX(i);
+        const ny = normal.getY(i);
+        const nz = normal.getZ(i);
+        const lobes = Math.sin(3.05 * x) * Math.sin(3.05 * y) * Math.sin(3.05 * z);
+        const above = smooth01((y + 0.35) / 1.25);
+        const amount = Math.pow(Math.max(0, lobes), 1.45) * 0.92 * above;
+        const sx = x + nx * amount;
+        const sy = y + ny * amount;
+        const sz = z + nz * amount;
+        spikeAbsolute[i * 3] = sx;
+        spikeAbsolute[i * 3 + 1] = sy;
+        spikeAbsolute[i * 3 + 2] = sz;
+        spikeDelta[i * 3] = sx - x;
+        spikeDelta[i * 3 + 1] = sy - y;
+        spikeDelta[i * 3 + 2] = sz - z;
+
+        const widen = 1.32;
+        const shorten = 0.58;
+        const qx = x * widen;
+        const qy = y * shorten;
+        const qz = z * widen;
+        squashAbsolute[i * 3] = qx;
+        squashAbsolute[i * 3 + 1] = qy;
+        squashAbsolute[i * 3 + 2] = qz;
+        squashDelta[i * 3] = qx - x;
+        squashDelta[i * 3 + 1] = qy - y;
+        squashDelta[i * 3 + 2] = qz - z;
+      }
+
+      const spikeAttr = new THREE.Float32BufferAttribute(spikeDelta, 3);
+      const squashAttr = new THREE.Float32BufferAttribute(squashDelta, 3);
+      spikeAttr.name = 'spike';
+      squashAttr.name = 'squash';
+      geometry.morphAttributes.position = [spikeAttr, squashAttr];
+      geometry.morphAttributes.normal = [
+        normalDeltas(geometry, spikeAbsolute),
+        normalDeltas(geometry, squashAbsolute)
+      ];
+      geometry.morphTargetsRelative = true;
+    }
+
+    function boot() {
+      motionNote.hidden = !reduceMotion;
+      playInput.checked = !reduceMotion;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf3eee6);
+
+      const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
+      camera.position.set(2.5, 1.25, 3.35);
+
+      const segments = narrow ? [32, 20] : [56, 36];
+      const geometry = new THREE.SphereGeometry(1.15, segments[0], segments[1]);
+      addMorphs(geometry);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xd06a45,
+        roughness: 0.58,
+        metalness: 0.02
+      });
+      const mesh = new THREE.Mesh(geometry, material);
+      scene.add(mesh);
+
+      const disc = new THREE.Mesh(
+        new THREE.CircleGeometry(2.15, narrow ? 32 : 56),
+        new THREE.MeshBasicMaterial({ color: 0xe7dccb })
+      );
+      disc.rotation.x = -Math.PI / 2;
+      disc.position.y = -1.32;
+      scene.add(disc);
+
+      scene.add(new THREE.HemisphereLight(0xfff8ee, 0xe7d3bc, 0.78));
+      const key = new THREE.DirectionalLight(0xfff1e0, 1.75);
+      key.position.set(3.4, 5.2, 4.2);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0xf0c9a0, 0.9);
+      rim.position.set(-4.2, 2.2, -3.2);
+      scene.add(rim);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = !reduceMotion;
+      controls.dampingFactor = 0.08;
+      controls.target.set(0, 0.05, 0);
+      controls.minDistance = 2.3;
+      controls.maxDistance = 8;
+      controls.maxPolarAngle = Math.PI * 0.53;
+      controls.autoRotate = false;
+      controls.update();
+
+      const homePosition = camera.position.clone();
+      const homeTarget = controls.target.clone();
+      const clock = new THREE.Clock();
+      let elapsed = 0;
+      let reported = false;
+
+      function influences() {
+        return {
+          spike: mesh.morphTargetInfluences[mesh.morphTargetDictionary.spike],
+          squash: mesh.morphTargetInfluences[mesh.morphTargetDictionary.squash]
+        };
+      }
+
+      function writeInfluences(spike, squash, fromPlay) {
+        const spikeIndex = mesh.morphTargetDictionary.spike;
+        const squashIndex = mesh.morphTargetDictionary.squash;
+        mesh.morphTargetInfluences[spikeIndex] = spike;
+        mesh.morphTargetInfluences[squashIndex] = squash;
+        if (!fromPlay) {
+          spikeInput.value = spike.toFixed(2);
+          squashInput.value = squash.toFixed(2);
+        } else {
+          spikeInput.value = spike.toFixed(2);
+          squashInput.value = squash.toFixed(2);
+        }
+        spikeOut.textContent = spike.toFixed(2);
+        squashOut.textContent = squash.toFixed(2);
+      }
+
+      function readSliders() {
+        writeInfluences(Number(spikeInput.value), Number(squashInput.value), false);
+      }
+
+      spikeInput.addEventListener('input', () => {
+        playInput.checked = false;
+        readSliders();
+      });
+      squashInput.addEventListener('input', () => {
+        playInput.checked = false;
+        readSliders();
+      });
+      document.getElementById('base').addEventListener('click', () => {
+        playInput.checked = false;
+        writeInfluences(0, 0, false);
+      });
+      document.getElementById('reset').addEventListener('click', () => {
+        camera.position.copy(homePosition);
+        controls.target.copy(homeTarget);
+        controls.update();
+      });
+
+      readSliders();
+
+      function resize() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      new ResizeObserver(resize).observe(stage);
+      resize();
+
+      function loop() {
+        requestAnimationFrame(loop);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        if (playInput.checked) {
+          elapsed += dt;
+          const spike = 0.5 + 0.5 * Math.sin(elapsed * 0.65);
+          const squash = 0.5 + 0.5 * Math.sin(elapsed * 0.65 + Math.PI);
+          writeInfluences(spike, squash, true);
+        }
+        controls.update();
+        renderer.render(scene, camera);
+        if (!reported && renderer.info.render.calls > 0) {
+          reported = true;
+          status.dataset.ready = '1';
+          status.hidden = true;
+          if (!influences().spike && !influences().squash && !playInput.checked) {
+            writeInfluences(0.8, 0, false);
+          }
+        }
+      }
+
+      loop();
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('WebGL did not start in this browser. ' + error.message);
+    }
+  </script>
+</body>
+</html>

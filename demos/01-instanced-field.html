@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instanced field — Seen Geometry</title>
+  <meta name="description" content="One box drawn many times. Each copy has its own matrix. InstancedMesh keeps this to a single draw call.">
+  <meta name="theme-color" content="#f3eee6">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <div class="titleblock">
+      <a class="brand" href="../index.html">Seen Geometry</a>
+      <p class="eyebrow">01 · InstancedMesh</p>
+      <h1>One shape, many matrices</h1>
+      <p class="lede">Each block is the same box. Only the matrix changes. Orbit the view; the copies stay where their matrices put them.</p>
+    </div>
+    <div class="chip">
+      <dl class="stats">
+        <div><dt>Copies</dt><dd id="copies">—</dd></div>
+        <div><dt>Draw calls</dt><dd id="draws">—</dd></div>
+        <div><dt>Pixel ratio</dt><dd id="dpr">—</dd></div>
+      </dl>
+    </div>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="A field of identical boxes. Each box has its own transform matrix."></canvas>
+  </div>
+  <section class="dock" aria-label="Selected matrix">
+    <h2 id="pick-title">Select a block</h2>
+    <p id="pick-help">Click, tap, or type a copy index. The clay column of the matrix is where that copy’s origin sits.</p>
+    <p class="fine" id="narrow-note" hidden>This window is narrow, so the field uses fewer copies and the blocks stay large enough to read.</p>
+    <div class="row">
+      <label>Copy index
+        <input id="index" type="number" min="0" step="1" value="0" inputmode="numeric">
+      </label>
+      <button type="button" class="quiet" id="reset">Reset view</button>
+    </div>
+    <p class="mono" id="parts" aria-live="polite"></p>
+    <table class="matrix" id="matrix">
+      <caption>4×4 matrix for this copy. Rows run left to right.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="fine">Color follows height so the field is easy to read. Color is not part of the matrix. Warm blocks are taller.</p>
+    <p class="fine" id="motion-note" hidden>Reduced motion is on, so the camera does not coast after you let go.</p>
+    <p class="next"><a href="02-morph-targets.html">Next: morph targets</a></p>
+  </section>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. This page loads three.js r170 from unpkg.com and needs a network connection.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const narrowQuery = window.matchMedia('(max-width: 760px)');
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const copiesEl = document.getElementById('copies');
+    const drawsEl = document.getElementById('draws');
+    const dprEl = document.getElementById('dpr');
+    const indexInput = document.getElementById('index');
+    const pickTitle = document.getElementById('pick-title');
+    const partsEl = document.getElementById('parts');
+    const matrixTable = document.getElementById('matrix');
+    const narrowNote = document.getElementById('narrow-note');
+    const motionNote = document.getElementById('motion-note');
+
+    const PAPER = 0xf3eee6;
+    const records = [];
+    let mesh;
+    let selected = 0;
+    let reported = false;
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function heightAt(u, v) {
+      const a = Math.exp(-((u + 0.25) ** 2 + (v - 0.1) ** 2) * 3.2);
+      const b = Math.exp(-((u - 0.45) ** 2 + (v + 0.25) ** 2) * 4.5);
+      return 0.35 + 1.7 * a + 1.15 * b;
+    }
+
+    function buildField(narrow) {
+      const cols = narrow ? 7 : 13;
+      const rows = narrow ? 5 : 9;
+      const spacing = 1.22;
+      const count = cols * rows;
+      const geometry = new THREE.BoxGeometry(0.66, 1, 0.66);
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.74,
+        metalness: 0
+      });
+      const field = new THREE.InstancedMesh(geometry, material, count);
+      const dummy = new THREE.Object3D();
+      const sand = new THREE.Color('#efd3b0');
+      const clay = new THREE.Color('#c4622d');
+      const color = new THREE.Color();
+      records.length = 0;
+
+      let index = 0;
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          const u = cols === 1 ? 0 : (col / (cols - 1)) * 2 - 1;
+          const v = rows === 1 ? 0 : (row / (rows - 1)) * 2 - 1;
+          const height = heightAt(u, v);
+          const yaw = 0.42 * Math.sin(u * 2.4 + v * 1.3);
+          dummy.position.set((col - (cols - 1) / 2) * spacing, height * 0.5, (row - (rows - 1) / 2) * spacing);
+          dummy.rotation.set(0, yaw, 0);
+          dummy.scale.set(1, height, 1);
+          dummy.updateMatrix();
+          field.setMatrixAt(index, dummy.matrix);
+          color.copy(sand).lerp(clay, Math.min(1, (height - 0.35) / 1.8));
+          field.setColorAt(index, color);
+          records.push({
+            matrix: dummy.matrix.clone(),
+            position: dummy.position.clone(),
+            yaw,
+            height,
+            color: color.clone()
+          });
+          index += 1;
+        }
+      }
+
+      field.instanceMatrix.needsUpdate = true;
+      field.instanceColor.needsUpdate = true;
+      field.computeBoundingSphere();
+      return field;
+    }
+
+    function fillMatrix(matrix) {
+      const elements = matrix.elements;
+      const body = matrixTable.tBodies[0];
+      for (let row = 0; row < 4; row += 1) {
+        for (let col = 0; col < 4; col += 1) {
+          body.rows[row].cells[col].textContent = elements[col * 4 + row].toFixed(2);
+        }
+      }
+    }
+
+    function showRecord(index) {
+      const record = records[index];
+      if (!record) return;
+      selected = index;
+      indexInput.value = String(index);
+      pickTitle.textContent = 'Copy ' + (index + 1) + ' of ' + records.length;
+      const degrees = record.yaw * 180 / Math.PI;
+      const position = record.position;
+      partsEl.textContent =
+        'Position  ' + position.x.toFixed(2) + ',  ' + position.y.toFixed(2) + ',  ' + position.z.toFixed(2) +
+        '    ·    yaw  ' + degrees.toFixed(1) + '°' +
+        '    ·    scale  1.00,  ' + record.height.toFixed(2) + ',  1.00';
+      fillMatrix(record.matrix);
+      records.forEach((item, itemIndex) => {
+        const paint = itemIndex === index ? new THREE.Color('#f6e27a') : item.color;
+        mesh.setColorAt(itemIndex, paint);
+      });
+      mesh.instanceColor.needsUpdate = true;
+    }
+
+    function boot() {
+      narrowNote.hidden = !narrowQuery.matches;
+      motionNote.hidden = !reduceMotion;
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 80);
+      mesh = buildField(narrowQuery.matches);
+      scene.add(mesh);
+      copiesEl.textContent = String(records.length);
+      indexInput.max = String(records.length - 1);
+
+      const span = Math.max(mesh.boundingSphere.radius, 4);
+      scene.fog = new THREE.Fog(PAPER, span * 2.4, span * 6.5);
+      camera.position.set(span * 0.72, span * 0.78, span * 1.05);
+      camera.lookAt(0, 0.65, 0);
+
+      scene.add(new THREE.HemisphereLight(0xfff8ee, 0xd9c4a8, 0.95));
+      const key = new THREE.DirectionalLight(0xfff3e2, 1.5);
+      key.position.set(-5, 10, 6);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0xd5e4f2, 0.4);
+      fill.position.set(8, 3, -5);
+      scene.add(fill);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = !reduceMotion;
+      controls.dampingFactor = 0.08;
+      controls.target.set(0, 0.65, 0);
+      controls.minPolarAngle = 0.18;
+      controls.maxPolarAngle = Math.PI / 2 - 0.04;
+      controls.minDistance = span * 0.45;
+      controls.maxDistance = span * 3.2;
+      controls.autoRotate = false;
+      controls.update();
+
+      const homePosition = camera.position.clone();
+      const homeTarget = controls.target.clone();
+      document.getElementById('reset').addEventListener('click', () => {
+        camera.position.copy(homePosition);
+        controls.target.copy(homeTarget);
+        controls.update();
+      });
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+
+      function pick(event) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObject(mesh);
+        if (hits.length > 0 && hits[0].instanceId !== undefined) showRecord(hits[0].instanceId);
+      }
+
+      let down = null;
+      canvas.addEventListener('pointerdown', (event) => {
+        down = { x: event.clientX, y: event.clientY };
+      });
+      canvas.addEventListener('pointerup', (event) => {
+        if (!down) return;
+        const dx = event.clientX - down.x;
+        const dy = event.clientY - down.y;
+        if (dx * dx + dy * dy < 16) pick(event);
+        down = null;
+      });
+
+      indexInput.addEventListener('input', () => {
+        const next = Number(indexInput.value);
+        if (Number.isInteger(next) && next >= 0 && next < records.length) showRecord(next);
+      });
+
+      function resize() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      const observer = new ResizeObserver(resize);
+      observer.observe(stage);
+      resize();
+      showRecord(Math.floor(records.length / 2));
+
+      function loop() {
+        requestAnimationFrame(loop);
+        controls.update();
+        renderer.render(scene, camera);
+        if (!reported && renderer.info.render.calls > 0) {
+          reported = true;
+          drawsEl.textContent = String(renderer.info.render.calls);
+          dprEl.textContent = renderer.getPixelRatio().toFixed(1);
+          status.dataset.ready = '1';
+          status.hidden = true;
+        }
+      }
+
+      loop();
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('WebGL did not start in this browser. ' + error.message);
+    }
+  </script>
+</body>
+</html>
