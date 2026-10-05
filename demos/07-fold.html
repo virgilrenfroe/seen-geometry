@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fold — Seen Geometry</title>
+  <meta name="description" content="A sheet folds across a crease. The fold is a reflection, so the mark flips and the determinant is −1.">
+  <meta name="theme-color" content="#e4d8c8">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="demo sheet">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">07 · Fold</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="A sheet of paper. Drag the crease. One half folds over the line and the mark flips."></canvas>
+    <div class="stamps">
+      <p id="det-stamp">det −1</p>
+    </div>
+  </div>
+  <section class="dock" aria-label="Fold">
+    <p class="index-no">07</p>
+    <h1>Fold</h1>
+    <p class="lede">Drag the crease. One half of the sheet folds over that line. A fold is a reflection.</p>
+    <p id="blurb">The line passes through the origin. The determinant is −1. The mark flips.</p>
+    <pre class="factors" id="factors"></pre>
+    <label class="field">
+      <span>Angle θ <output id="theta-out">22°</output></span>
+      <input id="theta" type="range" min="-70" max="70" step="1" value="22">
+    </label>
+    <label class="field">
+      <span>Offset <output id="offset-out">−0.32</output></span>
+      <input id="offset" type="range" min="-0.65" max="0.65" step="0.01" value="-0.32">
+    </label>
+    <p class="fine">The signal handle turns the crease. The dark handle slides it. A fold always flips handedness, as on the determinant page.</p>
+    <table class="matrix" id="matrix">
+      <caption id="matrix-caption">Reflection across the crease.</caption>
+      <tbody></tbody>
+    </table>
+    <p class="next"><a href="06-determinant.html">Determinant</a> · <a href="08-rotation.html">Next: rotation</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html" aria-current="page">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const thetaInput = document.getElementById('theta');
+    const offsetInput = document.getElementById('offset');
+    const blurb = document.getElementById('blurb');
+    const factors = document.getElementById('factors');
+    const matrixTable = document.getElementById('matrix');
+    const matrixCaption = document.getElementById('matrix-caption');
+
+    const PAPER = [[-1.35, -0.92], [1.35, -0.92], [1.35, 0.92], [-1.35, 0.92]];
+    const MARK = [
+      [0.40, -0.20], [0.56, -0.20], [0.56, 0.00], [0.74, 0.00], [0.74, 0.10],
+      [0.56, 0.10], [0.56, 0.20], [0.86, 0.20], [0.86, 0.34], [0.40, 0.34]
+    ];
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function wrap(angle) {
+      let value = angle;
+      while (value > Math.PI) value -= Math.PI * 2;
+      while (value < -Math.PI) value += Math.PI * 2;
+      return value;
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xe4d8c8);
+      const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
+      const camPos = new THREE.Vector3(0.15, -3.1, 2.5);
+      const camVel = new THREE.Vector3();
+      const look = new THREE.Vector3(0, 0, 0);
+
+      scene.add(new THREE.HemisphereLight(0xfff8ef, 0xd9c8b4, 0.95));
+      const key = new THREE.DirectionalLight(0xfff4e8, 1.15);
+      key.position.set(-2.2, -3.4, 4.2);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0xf0d2c2, 0.35);
+      fill.position.set(2.4, 1.2, 2);
+      scene.add(fill);
+
+      const table = new THREE.Mesh(
+        new THREE.PlaneGeometry(4.4, 3.2),
+        new THREE.MeshLambertMaterial({ color: 0xd9cbb8 })
+      );
+      table.position.z = -0.06;
+      scene.add(table);
+
+      const pivot = new THREE.Group();
+      const flap = new THREE.Group();
+      pivot.add(flap);
+      const still = new THREE.Group();
+      scene.add(pivot, still);
+
+      const paperMat = new THREE.MeshLambertMaterial({ vertexColors: true });
+      const creaseGeo = new THREE.BufferGeometry();
+      creaseGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(18), 3));
+      const crease = new THREE.Mesh(
+        creaseGeo,
+        new THREE.MeshBasicMaterial({ color: 0x141210, side: THREE.DoubleSide })
+      );
+      scene.add(crease);
+
+      function makeHandle(color) {
+        const mesh = new THREE.Mesh(
+          new THREE.CircleGeometry(0.11, 28),
+          new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })
+        );
+        mesh.position.z = 0.18;
+        scene.add(mesh);
+        return mesh;
+      }
+      const angleHandle = makeHandle(0xff3d1a);
+      const slideHandle = makeHandle(0x141210);
+
+      const frontMat = new THREE.MeshBasicMaterial({ color: 0x141210, side: THREE.FrontSide });
+      const backMat = new THREE.MeshBasicMaterial({ color: 0x141210, side: THREE.DoubleSide });
+      const ghostMat = new THREE.MeshBasicMaterial({
+        color: 0x243e66,
+        transparent: true,
+        opacity: 0.9,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+      const rider = new THREE.Mesh(new THREE.BufferGeometry(), frontMat);
+      const riderBack = new THREE.Mesh(new THREE.BufferGeometry(), backMat);
+      const ghost = new THREE.Mesh(new THREE.BufferGeometry(), ghostMat);
+      ghost.position.z = 0.03;
+      scene.add(ghost);
+
+      let theta = 22 * Math.PI / 180;
+      let thetaVel = 0;
+      let targetTheta = theta;
+      let dist = -0.32;
+      let distVel = 0;
+      let targetDist = dist;
+      let fold = reduce ? Math.PI * 0.97 : 0.35;
+      let foldVel = 0;
+      let dragging = null;
+      let sliderHold = null;
+      const bin = [];
+
+      function basis(angle) {
+        return {
+          u: [Math.cos(angle), Math.sin(angle)],
+          n: [-Math.sin(angle), Math.cos(angle)]
+        };
+      }
+
+      function clip(poly, angle, lineDist, keepPositive) {
+        const { n } = basis(angle);
+        const out = [];
+        for (let i = 0; i < poly.length; i += 1) {
+          const a = poly[i];
+          const b = poly[(i + 1) % poly.length];
+          const sa = a[0] * n[0] + a[1] * n[1] - lineDist;
+          const sb = b[0] * n[0] + b[1] * n[1] - lineDist;
+          const aIn = keepPositive ? sa >= -1e-5 : sa <= 1e-5;
+          const bIn = keepPositive ? sb >= -1e-5 : sb <= 1e-5;
+          if (aIn && bIn) out.push(b);
+          else if (aIn !== bIn) {
+            const t = sa / (sa - sb);
+            const hit = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+            out.push(hit);
+            if (bIn) out.push(b);
+          }
+        }
+        return out;
+      }
+
+      function polygonArea(poly) {
+        let sum = 0;
+        for (let i = 0; i < poly.length; i += 1) {
+          const p = poly[i];
+          const q = poly[(i + 1) % poly.length];
+          sum += p[0] * q[1] - p[1] * q[0];
+        }
+        return Math.abs(sum) * 0.5;
+      }
+
+      function paintGeometry(geometry) {
+        const pos = geometry.attributes.position;
+        const norm = geometry.attributes.normal;
+        const colors = new Float32Array(pos.count * 3);
+        for (let i = 0; i < pos.count; i += 1) {
+          const nz = norm.getZ(i);
+          const color = nz > 0.45 ? [0.969, 0.945, 0.910] : nz < -0.45 ? [0.831, 0.322, 0.196] : [0.851, 0.784, 0.706];
+          colors[i * 3] = color[0];
+          colors[i * 3 + 1] = color[1];
+          colors[i * 3 + 2] = color[2];
+        }
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      }
+
+      function shapeFrom(poly) {
+        const shape = new THREE.Shape();
+        shape.moveTo(poly[0][0], poly[0][1]);
+        for (let i = 1; i < poly.length; i += 1) shape.lineTo(poly[i][0], poly[i][1]);
+        const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.028, bevelEnabled: false });
+        geometry.translate(0, 0, -0.014);
+        paintGeometry(geometry);
+        return geometry;
+      }
+
+      function flatGeometry(poly, z) {
+        const positions = [];
+        for (let i = 1; i < poly.length - 1; i += 1) {
+          positions.push(poly[0][0], poly[0][1], z, poly[i][0], poly[i][1], z, poly[i + 1][0], poly[i + 1][1], z);
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.computeVertexNormals();
+        return geometry;
+      }
+
+      function drop(object) {
+        object.traverse((child) => {
+          if (child.geometry && bin.indexOf(child.geometry) === -1) bin.push(child.geometry);
+        });
+      }
+
+      function flush() {
+        bin.forEach((geometry) => geometry.dispose());
+        bin.length = 0;
+      }
+
+      function reflectPoint(x, y, angle, lineDist) {
+        const { n } = basis(angle);
+        const signed = x * n[0] + y * n[1] - lineDist;
+        return [x - 2 * signed * n[0], y - 2 * signed * n[1]];
+      }
+
+      function matrixEntries(angle, lineDist) {
+        const a = Math.cos(2 * angle);
+        const b = Math.sin(2 * angle);
+        const { n } = basis(angle);
+        const cx = lineDist * n[0];
+        const cy = lineDist * n[1];
+        return {
+          a,
+          b,
+          tx: cx - (a * cx + b * cy),
+          ty: cy - (b * cx - a * cy),
+          through: Math.abs(lineDist) < 0.03
+        };
+      }
+
+      function writeMatrix(entries) {
+        const body = matrixTable.tBodies[0];
+        body.replaceChildren();
+        const rows = entries.through
+          ? [[entries.a, entries.b], [entries.b, -entries.a]]
+          : [[entries.a, entries.b, entries.tx], [entries.b, -entries.a, entries.ty], [0, 0, 1]];
+        rows.forEach((row) => {
+          const tr = document.createElement('tr');
+          row.forEach((value) => {
+            const td = document.createElement('td');
+            td.textContent = value.toFixed(2);
+            tr.appendChild(td);
+          });
+          body.appendChild(tr);
+        });
+      }
+
+      function rebuild(angle, lineDist) {
+        drop(still);
+        drop(flap);
+        drop(ghost);
+        still.clear();
+        flap.clear();
+        const { u, n } = basis(angle);
+        const cx = lineDist * n[0];
+        const cy = lineDist * n[1];
+        pivot.position.set(cx, cy, 0);
+        pivot.rotation.set(0, 0, Math.atan2(u[1], u[0]));
+        const positive = clip(PAPER, angle, lineDist, true);
+        const negative = clip(PAPER, angle, lineDist, false);
+        if (polygonArea(negative) > 0.04) {
+          const mesh = new THREE.Mesh(shapeFrom(negative), paperMat);
+          const edges = new THREE.LineSegments(
+            new THREE.EdgesGeometry(mesh.geometry, 25),
+            new THREE.LineBasicMaterial({ color: 0x141210 })
+          );
+          still.add(mesh, edges);
+        }
+        if (polygonArea(positive) > 0.04) {
+          const local = positive.map((point) => {
+            const dx = point[0] - cx;
+            const dy = point[1] - cy;
+            return [dx * u[0] + dy * u[1], dx * n[0] + dy * n[1]];
+          });
+          const mesh = new THREE.Mesh(shapeFrom(local), paperMat);
+          const edges = new THREE.LineSegments(
+            new THREE.EdgesGeometry(mesh.geometry, 25),
+            new THREE.LineBasicMaterial({ color: 0x141210 })
+          );
+          flap.add(mesh, edges);
+          const localMark = MARK.map((point) => {
+            const dx = point[0] - cx;
+            const dy = point[1] - cy;
+            return [dx * u[0] + dy * u[1], dx * n[0] + dy * n[1]];
+          });
+          rider.geometry.dispose();
+          riderBack.geometry.dispose();
+          rider.geometry = flatGeometry(localMark, 0.03);
+          riderBack.geometry = flatGeometry(localMark, -0.03);
+          flap.add(rider, riderBack);
+        }
+        const hits = [];
+        PAPER.forEach((point, index) => {
+          const next = PAPER[(index + 1) % PAPER.length];
+          const sa = point[0] * n[0] + point[1] * n[1] - lineDist;
+          const sb = next[0] * n[0] + next[1] * n[1] - lineDist;
+          if (sa === 0 || sa * sb < 0) {
+            const t = sa / (sa - sb);
+            hits.push([point[0] + (next[0] - point[0]) * t, point[1] + (next[1] - point[1]) * t]);
+          }
+        });
+        if (hits.length >= 2) {
+          const positions = crease.geometry.attributes.position;
+          const lift = 0.045;
+          const width = 0.018;
+          const dx = hits[1][0] - hits[0][0];
+          const dy = hits[1][1] - hits[0][1];
+          const len = Math.hypot(dx, dy) || 1;
+          const px = -dy / len * width;
+          const py = dx / len * width;
+          const data = [
+            hits[0][0] + px, hits[0][1] + py, lift,
+            hits[1][0] + px, hits[1][1] + py, lift,
+            hits[0][0] - px, hits[0][1] - py, lift,
+            hits[1][0] + px, hits[1][1] + py, lift,
+            hits[1][0] - px, hits[1][1] - py, lift,
+            hits[0][0] - px, hits[0][1] - py, lift
+          ];
+          for (let i = 0; i < 6; i += 1) positions.setXYZ(i, data[i * 3], data[i * 3 + 1], data[i * 3 + 2]);
+          positions.needsUpdate = true;
+        }
+        ghost.geometry.dispose();
+        ghost.geometry = flatGeometry(MARK.map((point) => reflectPoint(point[0], point[1], angle, lineDist)), 0.02);
+        flush();
+      }
+
+      function springAngle(value, vel, target, dt) {
+        const accel = wrap(target - value) * (reduce ? 0 : 62) - vel * (reduce ? 0 : 9.5);
+        if (reduce) return [target, 0];
+        vel += accel * dt;
+        value = wrap(value + vel * dt);
+        return [value, vel];
+      }
+
+      function springLinear(value, vel, target, k, damp, dt, min, max) {
+        if (reduce) return [Math.min(max, Math.max(min, target)), 0];
+        vel += ((target - value) * k - vel * damp) * dt;
+        value += vel * dt;
+        if (value < min) { value = min; vel = 0; }
+        if (value > max) { value = max; vel = 0; }
+        return [value, vel];
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      let built = '';
+      const clock = new THREE.Clock();
+
+      function render(dt) {
+        const open = dragging || fold < 2.35;
+        const aim = open ? new THREE.Vector3(1.15, -2.35, 2.15) : new THREE.Vector3(0.2, -3.15, 2.85);
+        if (reduce) camPos.copy(aim);
+        else {
+          camVel.x += ((aim.x - camPos.x) * 6 - camVel.x * 5.5) * dt;
+          camVel.y += ((aim.y - camPos.y) * 6 - camVel.y * 5.5) * dt;
+          camVel.z += ((aim.z - camPos.z) * 6 - camVel.z * 5.5) * dt;
+          camPos.addScaledVector(camVel, dt);
+        }
+        camera.position.copy(camPos);
+        camera.lookAt(look);
+        const keyState = theta.toFixed(3) + ':' + dist.toFixed(3);
+        if (keyState !== built) {
+          built = keyState;
+          rebuild(theta, dist);
+        }
+        flap.rotation.x = fold;
+        ghostMat.opacity = Math.max(0, Math.min(0.9, (2.85 - fold) / 0.7));
+        const { n, u } = basis(theta);
+        slideHandle.position.set(dist * n[0], dist * n[1], 0.2);
+        angleHandle.position.set(dist * n[0] + u[0] * 1.05, dist * n[1] + u[1] * 1.05, 0.2);
+        const entries = matrixEntries(theta, dist);
+        const degrees = Math.round(wrap(theta) * 180 / Math.PI);
+        document.getElementById('theta-out').textContent = degrees + '°';
+        document.getElementById('offset-out').textContent = dist.toFixed(2);
+        document.getElementById('det-stamp').textContent = 'det −1';
+        if (sliderHold !== 'theta') thetaInput.value = String(degrees);
+        if (sliderHold !== 'offset') offsetInput.value = dist.toFixed(2);
+        if (entries.through) {
+          blurb.textContent = 'The line passes through the origin. The determinant is −1. The mark flips.';
+          matrixCaption.textContent = 'Reflection across a line through the origin.';
+          factors.textContent =
+            '2θ     ' + (degrees * 2) + '°\n' +
+            'cos 2θ ' + entries.a.toFixed(2) + '\n' +
+            'sin 2θ ' + entries.b.toFixed(2) + '\n' +
+            'det    −1.00';
+        } else {
+          blurb.textContent = 'The line misses the origin. Slide to the line. Reflect. Slide back. The determinant is still −1.';
+          matrixCaption.textContent = 'Slide, reflect, slide back.';
+          factors.textContent = 'M = T · reflect · T back\ndet    −1.00';
+        }
+        writeMatrix(entries);
+        frame();
+        renderer.render(scene, camera);
+      }
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const hitPoint = new THREE.Vector3();
+
+      function worldAt(event) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        return raycaster.ray.intersectPlane(plane, hitPoint) ? hitPoint : null;
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        const point = worldAt(event);
+        if (!point) return;
+        const da = Math.hypot(point.x - angleHandle.position.x, point.y - angleHandle.position.y);
+        const ds = Math.hypot(point.x - slideHandle.position.x, point.y - slideHandle.position.y);
+        if (da < 0.34 && da <= ds) dragging = 'angle';
+        else if (ds < 0.34) dragging = 'slide';
+        else return;
+        canvas.setPointerCapture(event.pointerId);
+      });
+      canvas.addEventListener('pointermove', (event) => {
+        const point = worldAt(event);
+        if (!point) return;
+        if (!dragging) {
+          const da = Math.hypot(point.x - angleHandle.position.x, point.y - angleHandle.position.y);
+          const ds = Math.hypot(point.x - slideHandle.position.x, point.y - slideHandle.position.y);
+          canvas.style.cursor = da < 0.34 || ds < 0.34 ? 'grab' : 'default';
+          return;
+        }
+        const { n, u } = basis(theta);
+        if (dragging === 'slide') {
+          targetDist = Math.min(0.65, Math.max(-0.65, point.x * n[0] + point.y * n[1]));
+        } else {
+          const cx = dist * n[0];
+          const cy = dist * n[1];
+          targetTheta = Math.atan2(point.y - cy, point.x - cx);
+          if (u[0] * Math.cos(targetTheta) + u[1] * Math.sin(targetTheta) < 0) targetTheta = wrap(targetTheta + Math.PI);
+        }
+        canvas.style.cursor = 'grabbing';
+      });
+      function endDrag() {
+        dragging = null;
+        canvas.style.cursor = 'default';
+      }
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+
+      function hold(input, name) {
+        input.addEventListener('pointerdown', () => { sliderHold = name; });
+        input.addEventListener('pointerup', () => { sliderHold = null; });
+        input.addEventListener('pointercancel', () => { sliderHold = null; });
+      }
+      hold(thetaInput, 'theta');
+      hold(offsetInput, 'offset');
+      thetaInput.addEventListener('input', () => {
+        targetTheta = Number(thetaInput.value) * Math.PI / 180;
+        theta = targetTheta;
+        thetaVel = 0;
+      });
+      offsetInput.addEventListener('input', () => {
+        targetDist = Number(offsetInput.value);
+        dist = targetDist;
+        distVel = 0;
+      });
+
+      function loop() {
+        requestAnimationFrame(loop);
+        const dt = Math.min(clock.getDelta(), 0.033);
+        const foldTarget = dragging ? 1.15 : Math.PI * 0.97;
+        [theta, thetaVel] = springAngle(theta, thetaVel, targetTheta, dt);
+        [dist, distVel] = springLinear(dist, distVel, targetDist, 70, 11, dt, -0.65, 0.65);
+        [fold, foldVel] = springLinear(fold, foldVel, foldTarget, 16, 7.2, dt, 0, Math.PI);
+        render(dt);
+      }
+
+      render(0.016);
+      status.dataset.ready = '1';
+      status.hidden = true;
+      loop();
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>

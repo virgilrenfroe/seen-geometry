@@ -268,7 +268,9 @@ body[data-view="gallery"] .index strong {
 body[data-view="gallery"] .index li:nth-child(2) strong,
 body[data-view="gallery"] .index li:nth-child(3) strong,
 body[data-view="gallery"] .index li:nth-child(5) strong,
-body[data-view="gallery"] .index li:nth-child(6) strong {
+body[data-view="gallery"] .index li:nth-child(6) strong,
+body[data-view="gallery"] .index li:nth-child(7) strong,
+body[data-view="gallery"] .index li:nth-child(8) strong {
   font-size: clamp(1.7rem, 3.2vw, 3.15rem);
 }
 
@@ -359,6 +361,17 @@ body[data-view="spiral"] .index li:nth-child(6) {
   margin-left: 16vw;
 }
 
+body[data-view="spiral"] .index li:nth-child(7) {
+  transform: rotate(-5deg);
+  margin-left: 7vw;
+  margin-top: 0.3rem;
+}
+
+body[data-view="spiral"] .index li:nth-child(8) {
+  transform: rotate(4deg);
+  margin-left: 18vw;
+}
+
 body[data-view="spiral"] .index li:nth-child(2) a {
   background: var(--signal);
 }
@@ -382,6 +395,10 @@ body[data-view="spiral"] .index li:nth-child(2) a {
 body.demo {
   min-height: 100vh;
   background: var(--ground);
+}
+
+body.sheet .stage {
+  background: #e4d8c8;
 }
 
 .top {
@@ -797,7 +814,9 @@ input[type="number"] {
   body[data-view="spiral"] .index li:nth-child(3),
   body[data-view="spiral"] .index li:nth-child(4),
   body[data-view="spiral"] .index li:nth-child(5),
-  body[data-view="spiral"] .index li:nth-child(6) {
+  body[data-view="spiral"] .index li:nth-child(6),
+  body[data-view="spiral"] .index li:nth-child(7),
+  body[data-view="spiral"] .index li:nth-child(8) {
     margin-left: 7vw;
   }
 
