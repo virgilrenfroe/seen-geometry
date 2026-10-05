@@ -37,9 +37,11 @@ Any static server is fine. The requirement is `http://`, not `file://`.
 
 ## GitHub Pages
 
-The live site is [https://virgilrenfroe.github.io/seen-geometry/](https://virgilrenfroe.github.io/seen-geometry/).
+The site is ready to publish from the `main` branch at the repository root (`index.html` is the hub). The address is [https://virgilrenfroe.github.io/seen-geometry/](https://virgilrenfroe.github.io/seen-geometry/).
 
-It is published from the `main` branch at the repository root (`index.html` is the hub).
+That address is not serving yet. Enabling Pages needs repository administration. The token used to push this repo can update `main`, and GitHub rejected the Pages API with “Resource not accessible by integration” (it requires `pages=write` and `administration=write`).
+
+A repository admin can turn it on in one step: **Settings → Pages → Build and deployment → Deploy from a branch → Branch `main`, folder `/ (root)` → Save.** `.nojekyll` is already in the root so Pages will serve the HTML as written.
 
 ## How the pictures are drawn
 
