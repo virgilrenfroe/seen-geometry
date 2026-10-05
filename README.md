@@ -15,6 +15,8 @@ An educator directed AI agents to build these pages. The author is not a softwar
 | [02 Morph targets](demos/02-morph-targets.html) | Two blend shapes, spike and squash, added with sliders. |
 | [03 Order of transforms](demos/03-compose-transforms.html) | The same translate, rotate, and scale, multiplied in three orders. |
 | [04 Point vs direction](demos/04-point-vs-direction.html) | One arrow as a point (w = 1) and as a direction (w = 0). Translation moves only the point. |
+| [05 Shear](demos/05-shear.html) | A shear slider. The area of the unit square stays 1 while the corner angle changes. |
+| [06 Determinant and reflection](demos/06-determinant.html) | Drag i and j. The area of the image is \|det\|. A negative determinant mirrors the F. Zero flattens it onto a line. |
 
 On a wide screen, demo 03 can show all three orders at once. The tail positions are listed either way. Demo 04 can show the point and the direction side by side.
 
@@ -24,6 +26,8 @@ A useful order for a class:
 2. In demo 02, set one slider to 0 and sweep the other. Then let both sit in the middle.
 3. In demo 03, sweep the rotation while watching the dark origin dot. With `T · R · S`, the tail stays on the X axis. The other products move the tail off that axis.
 4. In demo 04, sweep translate X. The point arrow’s tip moves. The direction arrow, w = 0, stays on the origin. Then add a little rotation and watch both arrows turn.
+5. In demo 05, sweep the shear. The area stays 1. The corner angle changes. Then switch the shear from X to Y.
+6. In demo 06, press Reflect across Y. The determinant turns negative and the F reads backwards. Press Squash to a line. The determinant becomes 0 and the F lies on that line.
 
 ## Run locally
 

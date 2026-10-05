@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shear — Seen Geometry</title>
+  <meta name="description" content="A shear of the unit square. The area stays 1. The corner angle changes.">
+  <meta name="theme-color" content="#f3eee6">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">05 · Shear</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="A grid of squares under a shear. The area stays the same. The corners change."></canvas>
+    <div class="stamps">
+      <p id="area-stamp">Area 1.00</p>
+    </div>
+  </div>
+  <section class="dock" aria-label="Shear">
+    <p class="index-no">05</p>
+    <h1>Shear</h1>
+    <p class="lede">Slide one side of the square. The area stays the same. The corner angle changes.</p>
+    <div class="orders" role="group" aria-label="Shear direction">
+      <button type="button" data-axis="x" aria-pressed="true">Along X</button>
+      <button type="button" data-axis="y" aria-pressed="false">Along Y</button>
+    </div>
+    <p id="blurb">The shear slides x. It adds k times y to x. Horizontal lines stay horizontal.</p>
+    <pre class="factors" id="factors"></pre>
+    <label class="field">
+      <span>Shear k <output id="k-out">0.75</output></span>
+      <input id="k" type="range" min="-1.4" max="1.4" step="0.01" value="0.75">
+    </label>
+    <ul class="tails">
+      <li><span class="swatch clay"></span><span>Area</span><span id="area-out">1.00</span></li>
+      <li><span class="swatch"></span><span>Angle</span><span id="angle-out">—</span></li>
+    </ul>
+    <p class="fine">The signal square is the unit square. Its area is the absolute value of the determinant. For this shear, that value stays 1.</p>
+    <table class="matrix" id="matrix">
+      <caption>2×2 shear. Read each row from left to right.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="next"><a href="04-point-vs-direction.html">Point vs direction</a> · <a href="06-determinant.html">Next: determinant</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html" aria-current="page">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const kInput = document.getElementById('k');
+    const factors = document.getElementById('factors');
+    const blurb = document.getElementById('blurb');
+    const matrixTable = document.getElementById('matrix');
+    const buttons = Array.from(document.querySelectorAll('.orders button'));
+
+    let axis = 'x';
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function cellGeometry(x, y) {
+      const shape = new THREE.Shape();
+      shape.moveTo(x, y);
+      shape.lineTo(x + 1, y);
+      shape.lineTo(x + 1, y + 1);
+      shape.lineTo(x, y + 1);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function gridLines() {
+      const pts = [];
+      for (let i = -1; i <= 2; i += 1) {
+        pts.push(-1, i, 0.03, 2, i, 0.03);
+        pts.push(i, -1, 0.03, i, 2, 0.03);
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+      return geometry;
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xf3eee6);
+      const camera = new THREE.OrthographicCamera(-4, 4, 3, -3, 0.1, 40);
+      camera.position.set(0.5, 0.5, 12);
+
+      const axes = new THREE.BufferGeometry();
+      axes.setAttribute('position', new THREE.Float32BufferAttribute([
+        -4, 0, -0.02, 5, 0, -0.02,
+        0, -3, -0.02, 0, 4, -0.02
+      ], 3));
+      scene.add(new THREE.LineSegments(axes, new THREE.LineBasicMaterial({ color: 0xb7ad9f })));
+
+      const field = new THREE.Group();
+      field.matrixAutoUpdate = false;
+      for (let y = -1; y <= 1; y += 1) {
+        for (let x = -1; x <= 1; x += 1) {
+          const unit = x === 0 && y === 0;
+          const mesh = new THREE.Mesh(
+            cellGeometry(x, y),
+            new THREE.MeshBasicMaterial({
+              color: unit ? 0xff3d1a : 0xe6ddd2,
+              side: THREE.DoubleSide
+            })
+          );
+          mesh.position.z = unit ? 0.01 : 0;
+          field.add(mesh);
+        }
+      }
+      field.add(new THREE.LineSegments(gridLines(), new THREE.LineBasicMaterial({ color: 0x141210 })));
+      scene.add(field);
+
+      const dot = new THREE.Mesh(
+        new THREE.CircleGeometry(0.06, 20),
+        new THREE.MeshBasicMaterial({ color: 0x141210 })
+      );
+      dot.position.z = 0.08;
+      scene.add(dot);
+
+      function columns(k) {
+        if (axis === 'x') return { a: 1, b: k, c: 0, d: 1, i: [1, 0], j: [k, 1] };
+        return { a: 1, b: 0, c: k, d: 1, i: [1, k], j: [0, 1] };
+      }
+
+      function mapPoint(k, x, y) {
+        const m = columns(k);
+        return [m.a * x + m.b * y, m.c * x + m.d * y];
+      }
+
+      function fillMatrix(m) {
+        const body = matrixTable.tBodies[0];
+        const values = [m.a, m.b, m.c, m.d];
+        for (let i = 0; i < 4; i += 1) {
+          body.rows[Math.floor(i / 2)].cells[i % 2].textContent = values[i].toFixed(2);
+        }
+      }
+
+      function frame(k) {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        const samples = [[-1, -1], [-1, 2], [2, -1], [2, 2]].map(([x, y]) => mapPoint(k, x, y));
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
+        samples.forEach(([x, y]) => {
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+        });
+        const pad = 0.55;
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        let halfW = (maxX - minX) / 2 + pad;
+        let halfH = (maxY - minY) / 2 + pad;
+        const aspect = width / height;
+        if (halfW / halfH < aspect) halfW = halfH * aspect;
+        else halfH = halfW / aspect;
+        camera.position.set(cx, cy, 12);
+        camera.lookAt(cx, cy, 0);
+        camera.left = -halfW;
+        camera.right = halfW;
+        camera.top = halfH;
+        camera.bottom = -halfH;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function sync() {
+        const k = Number(kInput.value);
+        document.getElementById('k-out').textContent = k.toFixed(2);
+        const m = columns(k);
+        const det = m.a * m.d - m.b * m.c;
+        const area = Math.abs(det);
+        const dot = m.i[0] * m.j[0] + m.i[1] * m.j[1];
+        const cross = m.i[0] * m.j[1] - m.i[1] * m.j[0];
+        const angle = Math.atan2(Math.abs(cross), dot) * 180 / Math.PI;
+        const matrix = new THREE.Matrix4().set(
+          m.a, m.b, 0, 0,
+          m.c, m.d, 0, 0,
+          0, 0, 1, 0,
+          0, 0, 0, 1
+        );
+        field.matrix.copy(matrix);
+        field.matrixWorldNeedsUpdate = true;
+        blurb.textContent = axis === 'x'
+          ? 'The shear slides x. It adds k times y to x. Horizontal lines stay horizontal.'
+          : 'The shear slides y. It adds k times x to y. Vertical lines stay vertical.';
+        factors.textContent =
+          'det    ' + det.toFixed(2) + '\n' +
+          'area   ' + area.toFixed(2) + '\n' +
+          'angle  ' + angle.toFixed(0) + '°';
+        document.getElementById('area-out').textContent = area.toFixed(2);
+        document.getElementById('angle-out').textContent = angle.toFixed(0) + '°';
+        document.getElementById('area-stamp').textContent = 'Area ' + area.toFixed(2);
+        fillMatrix(m);
+        buttons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.axis === axis));
+        });
+        frame(k);
+        renderer.render(scene, camera);
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          axis = button.dataset.axis;
+          sync();
+        });
+      });
+      kInput.addEventListener('input', sync);
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+
+      function loop() {
+        requestAnimationFrame(loop);
+        renderer.render(scene, camera);
+      }
+      loop();
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>
