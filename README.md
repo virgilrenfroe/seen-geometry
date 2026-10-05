@@ -52,6 +52,6 @@ A root `Dockerfile` serves the same files with nginx. `railway.toml` tells Railw
 - Pixel ratio is capped at 2.
 - Narrow screens use fewer instances in demo 01 and a coarser sphere in demo 02.
 - If the operating system asks for reduced motion, demo 02 does not play on its own, and camera damping stays off. Orbit and sliders still work.
-- If the three.js file cannot be loaded, the page says so instead of sitting on a blank canvas.
+- If the picture cannot load, the page says so instead of sitting on a blank canvas.
 
 Type is [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque), [Instrument Sans](https://fonts.google.com/specimen/Instrument+Sans), and [Space Mono](https://fonts.google.com/specimen/Space+Mono), with a system-font fallback. Each lesson is one HTML file under `demos/`, so the source of a single page is the whole lesson.

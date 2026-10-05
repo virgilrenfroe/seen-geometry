@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Instanced field — Seen Geometry</title>
-  <meta name="description" content="One box drawn many times. Each copy has its own matrix. InstancedMesh keeps this to a single draw call.">
+  <meta name="description" content="One box, drawn many times. Each copy has its own matrix. The computer draws every copy in one pass.">
   <meta name="theme-color" content="#f3eee6">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,34 +23,33 @@
 <body class="demo">
   <header class="top">
     <a class="brand" href="../index.html">Seen Geometry</a>
-    <p class="eyebrow">01 · InstancedMesh</p>
+    <p class="eyebrow">01 · Instanced field</p>
     <div class="chip">
       <dl class="stats">
         <div><dt>Copies</dt><dd id="copies">—</dd></div>
         <div><dt>Draw calls</dt><dd id="draws">—</dd></div>
-        <div><dt>Pixel ratio</dt><dd id="dpr">—</dd></div>
       </dl>
     </div>
   </header>
   <div class="stage" id="stage">
-    <canvas id="canvas" aria-label="A field of identical boxes. Each box has its own transform matrix."></canvas>
+    <canvas id="canvas" aria-label="A field of identical boxes. Each box has its own matrix."></canvas>
   </div>
   <section class="dock" aria-label="Selected matrix">
     <p class="index-no">01</p>
     <h1>One shape, many matrices</h1>
-    <p class="lede">Each block is the same box. Only the matrix changes. Orbit the view; the copies stay where their matrices put them.</p>
+    <p class="lede">Each block is the same box. Only its matrix changes. Drag the picture to look around. The copies stay where their matrices put them.</p>
+    <p>Look at Draw calls. The number stays at 1. The computer draws every copy in one pass. The copies share one shape. Only their matrices differ.</p>
     <h2 id="pick-title">Select a block</h2>
-    <p id="pick-help">Click, tap, or type a copy index. The clay column of the matrix is where that copy’s origin sits.</p>
-    <p class="fine" id="narrow-note" hidden>This window is narrow, so the field uses fewer copies and the blocks stay large enough to read.</p>
+    <p id="pick-help">Click a block, or type its number. The rightmost column of the matrix is the position of that copy.</p>
     <div class="row">
-      <label>Copy index
+      <label>Copy number
         <input id="index" type="number" min="0" step="1" value="0" inputmode="numeric">
       </label>
       <button type="button" class="quiet" id="reset">Reset view</button>
     </div>
     <p class="mono" id="parts" aria-live="polite"></p>
     <table class="matrix" id="matrix">
-      <caption>4×4 matrix for this copy. Rows run left to right.</caption>
+      <caption>4×4 matrix for this copy. Read each row from left to right. The rightmost column is the position.</caption>
       <tbody>
         <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
         <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
@@ -58,22 +57,21 @@
         <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
-    <p class="fine">Color follows height so the field is easy to read. Color is not part of the matrix. Warm blocks are taller.</p>
-    <p class="fine" id="motion-note" hidden>Reduced motion is on, so the camera does not coast after you let go.</p>
+    <p class="fine">Color shows height. Color is not in the matrix. Taller blocks are warmer.</p>
     <p class="next"><a href="02-morph-targets.html">Next: morph targets</a></p>
   </section>
-  <nav class="reelbar" aria-label="Archive">
+  <nav class="reelbar" aria-label="Lessons">
     <div class="reelbar-track">
       <a href="01-instanced-field.html" aria-current="page">01 Instanced field</a>
       <a href="02-morph-targets.html">02 Morph targets</a>
       <a href="03-compose-transforms.html">03 Order of transforms</a>
       <a href="04-point-vs-direction.html">04 Point vs direction</a>
-      <a href="../index.html">Index</a>
+      <a href="../index.html">Lessons</a>
       <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
       <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
       <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
       <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
-      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Index</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
     </div>
   </nav>
   <p class="status" id="status">Loading the picture…</p>
@@ -82,7 +80,7 @@
       var node = document.getElementById('status');
       if (!node || node.dataset.ready === '1') return;
       node.hidden = false;
-      node.textContent = 'The picture did not start. This page loads three.js r170 from unpkg.com and needs a network connection.';
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
     }, 12000);
   </script>
   <script type="module">
@@ -96,13 +94,10 @@
     const canvas = document.getElementById('canvas');
     const copiesEl = document.getElementById('copies');
     const drawsEl = document.getElementById('draws');
-    const dprEl = document.getElementById('dpr');
     const indexInput = document.getElementById('index');
     const pickTitle = document.getElementById('pick-title');
     const partsEl = document.getElementById('parts');
     const matrixTable = document.getElementById('matrix');
-    const narrowNote = document.getElementById('narrow-note');
-    const motionNote = document.getElementById('motion-note');
 
     const PAPER = 0xf3eee6;
     const records = [];
@@ -190,8 +185,8 @@
       const degrees = record.yaw * 180 / Math.PI;
       const position = record.position;
       partsEl.textContent =
-        'Position  ' + position.x.toFixed(2) + ',  ' + position.y.toFixed(2) + ',  ' + position.z.toFixed(2) +
-        '    ·    yaw  ' + degrees.toFixed(1) + '°' +
+        'position  ' + position.x.toFixed(2) + ',  ' + position.y.toFixed(2) + ',  ' + position.z.toFixed(2) +
+        '    ·    turn about vertical  ' + degrees.toFixed(1) + '°' +
         '    ·    scale  1.00,  ' + record.height.toFixed(2) + ',  1.00';
       fillMatrix(record.matrix);
       records.forEach((item, itemIndex) => {
@@ -202,9 +197,6 @@
     }
 
     function boot() {
-      narrowNote.hidden = !narrowQuery.matches;
-      motionNote.hidden = !reduceMotion;
-
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -302,7 +294,6 @@
         if (!reported && renderer.info.render.calls > 0) {
           reported = true;
           drawsEl.textContent = String(renderer.info.render.calls);
-          dprEl.textContent = renderer.getPixelRatio().toFixed(1);
           status.dataset.ready = '1';
           status.hidden = true;
         }
@@ -315,7 +306,7 @@
       boot();
     } catch (error) {
       console.error(error);
-      fail('WebGL did not start in this browser. ' + error.message);
+      fail('The picture did not start in this browser.');
     }
   </script>
 </body>

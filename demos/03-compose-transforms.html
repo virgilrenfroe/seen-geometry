@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Order of transforms — Seen Geometry</title>
-  <meta name="description" content="The same translate, rotate, and scale, multiplied in three orders. The pictures disagree.">
+  <meta name="description" content="The same translate, rotate, and scale, multiplied in three orders. The pictures are different.">
   <meta name="theme-color" content="#f3eee6">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,16 +30,16 @@
   <section class="dock" aria-label="Transform factors">
     <p class="index-no">03</p>
     <h1>Order changes the picture</h1>
-    <p class="lede">Same three numbers. The camera and the grid stay still. Only the product changes.</p>
+    <p class="lede">The three numbers stay the same. The grid stays still. Only the product changes.</p>
     <h2>Read the product from right to left</h2>
-    <p>The rightmost matrix touches the point first. The dark dot is the origin. It does not move with the arrow.</p>
+    <p>The rightmost matrix touches the point first. The dark dot is the origin. The origin does not move with the arrow.</p>
     <div class="orders" role="group" aria-label="Which product to show">
       <button type="button" data-order="trs" aria-pressed="true">T · R · S</button>
       <button type="button" data-order="rts" aria-pressed="false">R · T · S</button>
       <button type="button" data-order="srt" aria-pressed="false">S · R · T</button>
     </div>
     <p class="formula" id="formula">M = T · R · S</p>
-    <p id="blurb">Scale, then rotate, then translate. The arrow turns about its tail, then steps along X. This is the order an ordinary Three.js object uses.</p>
+    <p id="blurb">Scale first. Then rotate. Then translate. The arrow turns about its tail. Then it steps along X.</p>
     <pre class="factors" id="factors"></pre>
     <label class="field">
       <span>Translate X <output id="tx-out">1.05</output></span>
@@ -54,13 +54,12 @@
       <input id="sy" type="range" min="0.6" max="1.7" step="0.01" value="1.55">
     </label>
     <label class="check"><input id="compare" type="checkbox"> Show all three</label>
-    <p class="fine" id="compare-note" hidden>Side by side needs a wider window. The list below still gives every tail.</p>
     <ul class="tails">
       <li data-order="trs" class="is-selected"><span class="swatch clay"></span><span>T · R · S</span><span id="tail-trs"></span></li>
       <li data-order="rts"><span class="swatch moss"></span><span>R · T · S</span><span id="tail-rts"></span></li>
       <li data-order="srt"><span class="swatch navy"></span><span>S · R · T</span><span id="tail-srt"></span></li>
     </ul>
-    <p class="fine">The clay column is where the tail went: the image of the local origin.</p>
+    <p class="fine">Each line names one order. The rightmost column of its matrix is where the tail went. That point is the image of the local origin.</p>
     <table class="matrix" id="matrix">
       <caption id="matrix-caption">Matrix for T · R · S</caption>
       <tbody>
@@ -72,18 +71,18 @@
     </table>
     <p class="next"><a href="02-morph-targets.html">Morph targets</a> · <a href="04-point-vs-direction.html">Next: point vs direction</a></p>
   </section>
-  <nav class="reelbar" aria-label="Archive">
+  <nav class="reelbar" aria-label="Lessons">
     <div class="reelbar-track">
       <a href="01-instanced-field.html">01 Instanced field</a>
       <a href="02-morph-targets.html">02 Morph targets</a>
       <a href="03-compose-transforms.html" aria-current="page">03 Order of transforms</a>
       <a href="04-point-vs-direction.html">04 Point vs direction</a>
-      <a href="../index.html">Index</a>
+      <a href="../index.html">Lessons</a>
       <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
       <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
       <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
       <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
-      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Index</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
     </div>
   </nav>
   <p class="status" id="status">Loading the picture…</p>
@@ -92,7 +91,7 @@
       var node = document.getElementById('status');
       if (!node || node.dataset.ready === '1') return;
       node.hidden = false;
-      node.textContent = 'The picture did not start. This page loads three.js r170 from unpkg.com and needs a network connection.';
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
     }, 12000);
   </script>
   <script type="module">
@@ -105,7 +104,6 @@
     const degInput = document.getElementById('deg');
     const syInput = document.getElementById('sy');
     const compareInput = document.getElementById('compare');
-    const compareNote = document.getElementById('compare-note');
     const formula = document.getElementById('formula');
     const blurb = document.getElementById('blurb');
     const factors = document.getElementById('factors');
@@ -122,7 +120,7 @@
       trs: {
         name: 'T · R · S',
         color: 0xc4622d,
-        blurb: 'Scale, then rotate, then translate. The arrow turns about its tail, then steps along X. This is the order an ordinary Three.js object uses.',
+        blurb: 'Scale first. Then rotate. Then translate. The arrow turns about its tail. Then it steps along X.',
         multiply(T, R, S) {
           return new THREE.Matrix4().copy(T).multiply(R).multiply(S);
         }
@@ -130,7 +128,7 @@
       rts: {
         name: 'R · T · S',
         color: 0x2f6a4f,
-        blurb: 'Scale, then translate, then rotate. The move happens before the turn, so the arrow swings around the origin.',
+        blurb: 'Scale first. Then translate. Then rotate. The move happens before the turn. The arrow swings around the origin.',
         multiply(T, R, S) {
           return new THREE.Matrix4().copy(R).multiply(T).multiply(S);
         }
@@ -138,7 +136,7 @@
       srt: {
         name: 'S · R · T',
         color: 0x243e66,
-        blurb: 'Translate, then rotate, then scale. Scale is last, on world Y, so it stretches the picture vertically after the turn.',
+        blurb: 'Translate first. Then rotate. Then scale. Scale is last, along the vertical axis. It stretches the picture after the turn.',
         multiply(T, R, S) {
           return new THREE.Matrix4().copy(S).multiply(R).multiply(T);
         }
@@ -223,7 +221,6 @@
       function layout() {
         const wide = window.innerWidth >= 980;
         compareInput.disabled = !wide;
-        compareNote.hidden = wide;
         if (!wide) {
           compareInput.checked = false;
           showAll = false;
@@ -272,7 +269,7 @@
         document.getElementById('sy-out').textContent = sy.toFixed(2);
         factors.textContent =
           'T  translate(' + tx.toFixed(2) + ', 0, 0)\n' +
-          'R  rotateZ(' + degrees.toFixed(0) + '°)\n' +
+          'R  rotate about Z (' + degrees.toFixed(0) + '°)\n' +
           'S  scale(1, ' + sy.toFixed(2) + ', 1)';
 
         const T = new THREE.Matrix4().makeTranslation(tx, 0, 0);
@@ -288,7 +285,7 @@
           slot.product.matrix.copy(matrix);
           slot.product.matrixWorldNeedsUpdate = true;
           const tail = document.getElementById('tail-' + slot.id);
-          tail.textContent = 'tail  ' + matrix.elements[12].toFixed(2) + ',  ' + matrix.elements[13].toFixed(2) + ',  ' + matrix.elements[14].toFixed(2);
+          tail.textContent = 'tail at  ' + matrix.elements[12].toFixed(2) + ',  ' + matrix.elements[13].toFixed(2) + ',  ' + matrix.elements[14].toFixed(2);
           const row = tail.closest('li');
           row.classList.toggle('is-selected', slot.id === selected);
           if (slot.id === selected) fillMatrix(matrix);
@@ -330,7 +327,7 @@
       boot();
     } catch (error) {
       console.error(error);
-      fail('WebGL did not start in this browser. ' + error.message);
+      fail('The picture did not start in this browser.');
     }
   </script>
 </body>
