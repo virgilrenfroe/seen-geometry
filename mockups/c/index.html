@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seen Geometry</title>
+  <meta name="description" content="Eight pictures for a first course in coordinate geometry. Each picture shows one transform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,720&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="hub">
+  <div class="sheet">
+    <header class="mast">
+      <p class="kicker">Sheet C · paper</p>
+      <h1>Seen Geometry</h1>
+      <p class="deck">Eight pictures. Each one is a matrix acting on a shape. Unfold a lesson.</p>
+    </header>
+    <div class="valley" aria-hidden="true"></div>
+    <div class="grid">
+      <article class="panel">
+        <p class="num">01</p>
+        <h2>Instanced field</h2>
+        <p>One box. Many matrices. Every copy is drawn in one pass.</p>
+      </article>
+      <article class="panel">
+        <p class="num">02</p>
+        <h2>Morph targets</h2>
+        <p>Spike and squash. Two weights move the same points.</p>
+      </article>
+      <article class="panel">
+        <p class="num">03</p>
+        <h2>Order of transforms</h2>
+        <p>Same translate, rotate, and scale. Three products. Three pictures.</p>
+      </article>
+      <article class="panel">
+        <p class="num">04</p>
+        <h2>Point vs direction</h2>
+        <p>w = 1 moves. w = 0 stays. Same translation.</p>
+      </article>
+      <article class="panel">
+        <p class="num">05</p>
+        <h2>Shear</h2>
+        <p>The area stays 1. The corner angle changes.</p>
+      </article>
+      <article class="panel">
+        <p class="num">06</p>
+        <h2>Determinant and reflection</h2>
+        <p>A negative determinant flips the shape. Zero flattens it.</p>
+      </article>
+      <article class="panel lift">
+        <p class="num">07</p>
+        <h2>Fold</h2>
+        <p>A crease reflects the sheet. The mark flips.</p>
+        <a href="demo.html">Open this fold</a>
+      </article>
+      <article class="panel">
+        <p class="num">08</p>
+        <h2>Rotation</h2>
+        <p>A point on the circle. Two folds make one turn.</p>
+      </article>
+    </div>
+    <span class="ear" aria-hidden="true"></span>
+    <p class="foot">This is a sample teaching page. <a href="https://github.com/virgilrenfroe/seen-geometry/blob/main/README.md">README</a>.</p>
+  </div>
+  <script>
+    document.querySelectorAll(".panel").forEach(function (panel) {
+      panel.addEventListener("click", function (e) {
+        if (e.target.closest("a")) return;
+        panel.classList.toggle("open");
+      });
+    });
+  </script>
+</body>
+</html>

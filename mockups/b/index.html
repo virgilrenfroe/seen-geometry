@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seen Geometry</title>
+  <meta name="description" content="Eight pictures for a first course in coordinate geometry. Each picture shows one transform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,720&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="hub">
+  <div class="stage" id="stage">
+    <div class="toy title" data-r="-2">
+      <span class="sticker">B</span>
+      <p class="num">EIGHT LESSONS</p>
+      <h1>Seen<br>Geometry</h1>
+      <p>Pick one up. Give it a push.</p>
+    </div>
+    <div class="toy n1" data-r="2.4">
+      <p class="num">01</p>
+      <h2>Instanced field</h2>
+      <p>One box. Many matrices. Every copy is drawn in one pass.</p>
+    </div>
+    <div class="toy n2" data-r="-3.2">
+      <p class="num">02</p>
+      <h2>Morph targets</h2>
+      <p>Spike and squash. Two weights move the same points.</p>
+    </div>
+    <div class="toy n3" data-r="2">
+      <p class="num">03</p>
+      <h2>Order of transforms</h2>
+      <p>Same translate, rotate, and scale. Three products. Three pictures.</p>
+    </div>
+    <div class="toy n4" data-r="3">
+      <p class="num">04</p>
+      <h2>Point vs direction</h2>
+      <p>w = 1 moves. w = 0 stays. Same translation.</p>
+    </div>
+    <div class="toy n5" data-r="-4">
+      <p class="num">05</p>
+      <h2>Shear</h2>
+      <p>The area stays 1. The corner angle changes.</p>
+    </div>
+    <a class="toy n6" data-r="1.4" href="demo.html" draggable="false">
+      <p class="num">06</p>
+      <h2>Determinant and reflection</h2>
+      <p>A negative determinant flips the shape. Zero flattens it.</p>
+      <span class="go">Drag, then open</span>
+    </a>
+    <div class="toy n7" data-r="-2.4">
+      <p class="num">07</p>
+      <h2>Fold</h2>
+      <p>A crease reflects the sheet. The mark flips.</p>
+    </div>
+    <div class="toy n8" data-r="-1.4">
+      <p class="num">08</p>
+      <h2>Rotation</h2>
+      <p>A point on the circle. Two folds make one turn.</p>
+    </div>
+  </div>
+  <p class="colophon">This is a sample teaching page. <a href="https://github.com/virgilrenfroe/seen-geometry/blob/main/README.md">README</a>.</p>
+  <script>
+    (function () {
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var toys = Array.prototype.map.call(document.querySelectorAll(".toy"), function (el) {
+        return { el: el, dx: 0, dy: 0, vx: 0, vy: 0, held: false, moved: false, r: parseFloat(el.dataset.r) || 0, sx: 0, sy: 0, lx: 0, ly: 0, lt: 0, pid: null };
+      });
+      var live = false;
+
+      function paint(t) {
+        var tilt = t.held ? t.vx * 0.35 : t.vx * 0.22;
+        var scale = t.held ? 1.035 : 1;
+        t.el.style.transform = "translate(" + t.dx + "px," + t.dy + "px) rotate(" + (t.r + tilt) + "deg) scale(" + scale + ")";
+      }
+
+      function kick() {
+        if (live) return;
+        live = true;
+        requestAnimationFrame(step);
+      }
+
+      function step() {
+        var moving = false;
+        toys.forEach(function (t) {
+          if (t.held) { moving = true; return; }
+          if (Math.abs(t.dx) + Math.abs(t.dy) + Math.abs(t.vx) + Math.abs(t.vy) < 0.2) {
+            if (t.dx || t.dy || t.vx || t.vy) {
+              t.dx = t.dy = t.vx = t.vy = 0;
+              t.el.style.transform = "";
+            }
+            return;
+          }
+          moving = true;
+          if (reduce) {
+            t.dx = t.dy = t.vx = t.vy = 0;
+            t.el.style.transform = "";
+            return;
+          }
+          t.vx += -t.dx * 0.055;
+          t.vy += -t.dy * 0.055;
+          t.vx *= 0.84;
+          t.vy *= 0.84;
+          t.dx += t.vx;
+          t.dy += t.vy;
+          paint(t);
+        });
+        if (moving) requestAnimationFrame(step);
+        else live = false;
+      }
+
+      toys.forEach(function (t) {
+        t.el.addEventListener("pointerdown", function (e) {
+          if (e.button !== 0) return;
+          t.held = true;
+          t.moved = false;
+          t.pid = e.pointerId;
+          t.sx = e.clientX - t.dx;
+          t.sy = e.clientY - t.dy;
+          t.lx = e.clientX;
+          t.ly = e.clientY;
+          t.lt = performance.now();
+          t.el.classList.add("held");
+          t.el.setPointerCapture(e.pointerId);
+          paint(t);
+        });
+        t.el.addEventListener("pointermove", function (e) {
+          if (!t.held || e.pointerId !== t.pid) return;
+          var now = performance.now();
+          var dt = Math.max(16, now - t.lt);
+          var nx = e.clientX - t.sx;
+          var ny = e.clientY - t.sy;
+          t.vx = (e.clientX - t.lx) / dt * 16;
+          t.vy = (e.clientY - t.ly) / dt * 16;
+          t.lx = e.clientX;
+          t.ly = e.clientY;
+          t.lt = now;
+          if (Math.hypot(e.clientX - (t.sx + t.dx), e.clientY - (t.sy + t.dy)) > 6 || Math.hypot(nx - t.dx, ny - t.dy) > 6) t.moved = true;
+          if (Math.hypot(nx, ny) > 5) t.moved = true;
+          t.dx = nx;
+          t.dy = ny;
+          paint(t);
+        });
+        function release(e) {
+          if (!t.held || (e && e.pointerId !== t.pid)) return;
+          t.held = false;
+          t.pid = null;
+          t.el.classList.remove("held");
+          if (t.moved) t.el.dataset.skip = "1";
+          kick();
+        }
+        t.el.addEventListener("pointerup", release);
+        t.el.addEventListener("pointercancel", release);
+        t.el.addEventListener("click", function (e) {
+          if (t.el.dataset.skip === "1") {
+            e.preventDefault();
+            t.el.dataset.skip = "";
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

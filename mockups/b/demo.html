@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Determinant and reflection — Seen Geometry</title>
+  <meta name="description" content="Drag i and j. The area of the image equals the absolute value of the determinant. A negative determinant flips the F.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,720&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="demo">
+  <header>
+    <a class="chip" href="index.html">Lessons</a>
+    <h1>Determinant and reflection</h1>
+  </header>
+  <div class="tray">
+    <canvas id="c" aria-label="An F on the unit square. Push the tips of i and j. A negative determinant mirrors the F."></canvas>
+    <div class="badge" id="badge">
+      <span>det</span>
+      <strong id="det">1.26</strong>
+    </div>
+    <pre class="mx" id="mx"></pre>
+  </div>
+  <p class="say" id="note"></p>
+  <div class="presets">
+    <button type="button" data-p="identity">Identity</button>
+    <button type="button" data-p="reflect">Reflect</button>
+    <button type="button" data-p="rot">Turn 90°</button>
+    <button type="button" data-p="shear">Shear</button>
+    <button type="button" data-p="squash">Flatten</button>
+  </div>
+  <p class="hint">Give i or j a push. The shape follows with weight.</p>
+  <p class="colophon">This is a sample teaching page. <a href="https://github.com/virgilrenfroe/seen-geometry/blob/main/README.md">README</a>.</p>
+  <script>
+    (function () {
+      var canvas = document.getElementById("c");
+      var detEl = document.getElementById("det");
+      var noteEl = document.getElementById("note");
+      var mxEl = document.getElementById("mx");
+      var badge = document.getElementById("badge");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var presets = {
+        identity: { i: [1, 0], j: [0, 1] },
+        reflect: { i: [-1, 0], j: [0, 1] },
+        rot: { i: [0, 1], j: [-1, 0] },
+        shear: { i: [1, 0], j: [0.8, 1] },
+        squash: { i: [1.2, 0.6], j: [0.8, 0.4] }
+      };
+      var P = {
+        i: { x: 1.2, y: 0.16, tx: 1.2, ty: 0.16, vx: 0, vy: 0 },
+        j: { x: 0.32, y: 1.02, tx: 0.32, ty: 1.02, vx: 0, vy: 0 }
+      };
+      var drag = null;
+      var ox = 0, oy = 0, sc = 1;
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function fmt(n) {
+        return (n < -0.004 ? "−" : "") + Math.abs(n).toFixed(2);
+      }
+      function toScreen(x, y) { return [ox + x * sc, oy - y * sc]; }
+
+      function colors(det, flat) {
+        if (flat) return { fill: "#1a1a1a", edge: "#000", badge: "#1a1a1a", badgeEdge: "#000" };
+        if (det < 0) return { fill: "#ff4b3e", edge: "#d1261c", badge: "#ff4b3e", badgeEdge: "#d1261c" };
+        return { fill: "#2f6bff", edge: "#1846c4", badge: "#2f6bff", badgeEdge: "#1846c4" };
+      }
+
+      function draw() {
+        var dpr = Math.min(2, window.devicePixelRatio || 1);
+        var w = canvas.clientWidth;
+        var h = canvas.clientHeight;
+        if (w < 2 || h < 2) return;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        var ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ox = w * 0.38;
+        oy = h * 0.58;
+        sc = Math.min(w, h) * 0.32;
+        var i = P.i, j = P.j;
+        var det = i.x * j.y - i.y * j.x;
+        var area = Math.abs(det);
+        var flat = area < 0.05;
+        var col = colors(det, flat);
+        ctx.clearRect(0, 0, w, h);
+
+        var p0 = toScreen(0, 0);
+        var u1 = toScreen(1, 0);
+        var u01 = toScreen(0, 1);
+        var u11 = toScreen(1, 1);
+        ctx.beginPath();
+        ctx.moveTo(p0[0], p0[1]); ctx.lineTo(u1[0], u1[1]); ctx.lineTo(u11[0], u11[1]); ctx.lineTo(u01[0], u01[1]);
+        ctx.closePath();
+        ctx.strokeStyle = "rgba(26,20,8,0.18)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        var pi = toScreen(i.x, i.y);
+        var pj = toScreen(j.x, j.y);
+        var pij = toScreen(i.x + j.x, i.y + j.y);
+        function poly(shift) {
+          ctx.beginPath();
+          ctx.moveTo(p0[0], p0[1] + shift);
+          ctx.lineTo(pi[0], pi[1] + shift);
+          ctx.lineTo(pij[0], pij[1] + shift);
+          ctx.lineTo(pj[0], pj[1] + shift);
+          ctx.closePath();
+        }
+        ctx.save();
+        ctx.shadowColor = "rgba(40,24,0,0.2)";
+        ctx.shadowBlur = 16;
+        ctx.shadowOffsetY = 12;
+        poly(12);
+        ctx.fillStyle = col.edge;
+        ctx.fill();
+        ctx.restore();
+        poly(0);
+        ctx.fillStyle = col.fill;
+        ctx.fill();
+
+        drawF(ctx, "#fff");
+        arrow(ctx, p0, pi, "#1a1408");
+        arrow(ctx, p0, pj, "#1a1408");
+        knob(ctx, pi, "#ff4fa0");
+        knob(ctx, pj, "#ffd23f");
+
+        detEl.textContent = fmt(det);
+        badge.style.setProperty("--badge", col.badge);
+        badge.style.setProperty("--badge-edge", col.badgeEdge);
+        mxEl.textContent = "[ " + fmt(i.x) + "   " + fmt(j.x) + " ]\n[ " + fmt(i.y) + "   " + fmt(j.y) + " ]\narea  " + fmt(area);
+        noteEl.textContent = flat
+          ? "The determinant is zero. The F lies on a line. The area is zero."
+          : det < 0
+            ? "The determinant is negative. The F reads backwards."
+            : "The determinant is positive. The F reads forwards. The area equals the determinant.";
+        document.querySelectorAll(".presets button").forEach(function (btn) {
+          var p = presets[btn.dataset.p];
+          var on = p && Math.abs(p.i[0] - i.tx) < 0.02 && Math.abs(p.i[1] - i.ty) < 0.02 && Math.abs(p.j[0] - j.tx) < 0.02 && Math.abs(p.j[1] - j.ty) < 0.02;
+          btn.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+      }
+
+      function drawF(ctx, color) {
+        var segs = [[[0.18, 0.2], [0.18, 0.8]], [[0.18, 0.8], [0.64, 0.8]], [[0.18, 0.5], [0.52, 0.5]]];
+        var i = P.i, j = P.j;
+        ctx.beginPath();
+        segs.forEach(function (seg) {
+          var a = seg[0], b = seg[1];
+          var p = toScreen(i.x * a[0] + j.x * a[1], i.y * a[0] + j.y * a[1]);
+          var q = toScreen(i.x * b[0] + j.x * b[1], i.y * b[0] + j.y * b[1]);
+          ctx.moveTo(p[0], p[1]);
+          ctx.lineTo(q[0], q[1]);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 8;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.stroke();
+      }
+
+      function arrow(ctx, a, b, color) {
+        var ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+        var endX = b[0] - 22 * Math.cos(ang);
+        var endY = b[1] - 22 * Math.sin(ang);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 14;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      }
+
+      function knob(ctx, p, color) {
+        ctx.fillStyle = "rgba(40,24,0,0.2)";
+        ctx.beginPath();
+        ctx.arc(p[0], p[1] + 6, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.45)";
+        ctx.beginPath();
+        ctx.arc(p[0] - 4, p[1] - 5, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function spring(p) {
+        if (reduce) { p.x = p.tx; p.y = p.ty; p.vx = 0; p.vy = 0; return; }
+        p.vx += (p.tx - p.x) * 0.18;
+        p.vy += (p.ty - p.y) * 0.18;
+        p.vx *= 0.72;
+        p.vy *= 0.72;
+        p.x += p.vx;
+        p.y += p.vy;
+      }
+
+      function frame() {
+        spring(P.i);
+        spring(P.j);
+        draw();
+        requestAnimationFrame(frame);
+      }
+
+      function local(e) {
+        var r = canvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+      }
+
+      canvas.addEventListener("pointerdown", function (e) {
+        var p = local(e);
+        var pi = toScreen(P.i.x, P.i.y);
+        var pj = toScreen(P.j.x, P.j.y);
+        var di = Math.hypot(p.x - pi[0], p.y - pi[1]);
+        var dj = Math.hypot(p.x - pj[0], p.y - pj[1]);
+        if (Math.min(di, dj) > 36) return;
+        drag = di <= dj ? P.i : P.j;
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener("pointermove", function (e) {
+        if (!drag) return;
+        var p = local(e);
+        drag.tx = clamp((p.x - ox) / sc, -1.65, 1.65);
+        drag.ty = clamp((oy - p.y) / sc, -1.65, 1.65);
+      });
+      function up() { drag = null; }
+      canvas.addEventListener("pointerup", up);
+      canvas.addEventListener("pointercancel", up);
+
+      document.querySelectorAll(".presets button").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var p = presets[btn.dataset.p];
+          P.i.tx = p.i[0]; P.i.ty = p.i[1];
+          P.j.tx = p.j[0]; P.j.ty = p.j[1];
+          if (reduce) {
+            P.i.x = P.i.tx; P.i.y = P.i.ty;
+            P.j.x = P.j.tx; P.j.y = P.j.ty;
+          }
+        });
+      });
+
+      window.addEventListener("resize", draw);
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>

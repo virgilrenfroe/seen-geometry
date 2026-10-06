@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Determinant and reflection — Seen Geometry</title>
+  <meta name="description" content="Drag i and j. The area of the image equals the absolute value of the determinant. A negative determinant flips the F.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,720&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="demo">
+  <div class="frame">
+    <span class="reg tl" aria-hidden="true"></span>
+    <span class="reg tr" aria-hidden="true"></span>
+    <span class="reg bl" aria-hidden="true"></span>
+    <span class="reg br" aria-hidden="true"></span>
+    <header class="hero">
+      <a class="back" href="index.html">Lessons</a>
+      <p class="rev">Plate 06 · determinant</p>
+      <h1>Determinant</h1>
+      <p class="deck">Drag the tips of i and j. The area of the image equals the absolute value of the determinant.</p>
+    </header>
+    <div class="stage">
+      <canvas id="c" aria-label="An F on the unit square. Drag the tips of i and j. A negative determinant mirrors the F."></canvas>
+    </div>
+    <aside class="side">
+      <p class="k">Det</p>
+      <p class="big" id="det">1.26</p>
+      <p class="k">Area</p>
+      <p class="big" id="area">1.26</p>
+      <pre class="mx" id="mx"></pre>
+      <p class="note" id="note"></p>
+      <div class="presets">
+        <button type="button" data-p="identity">Identity</button>
+        <button type="button" data-p="reflect">Reflect y</button>
+        <button type="button" data-p="rot">Rotate 90°</button>
+        <button type="button" data-p="shear">Shear</button>
+        <button type="button" data-p="squash">Squash</button>
+      </div>
+      <p class="hint">A negative sign mirrors the F. Zero lays the F on a line.</p>
+    </aside>
+    <p class="colophon">This is a sample teaching page. <a href="https://github.com/virgilrenfroe/seen-geometry/blob/main/README.md">README</a>.</p>
+  </div>
+  <script>
+    (function () {
+      var canvas = document.getElementById("c");
+      var detEl = document.getElementById("det");
+      var areaEl = document.getElementById("area");
+      var mxEl = document.getElementById("mx");
+      var noteEl = document.getElementById("note");
+      var i = { x: 1.25, y: 0.18 };
+      var j = { x: 0.28, y: 1.05 };
+      var ox = 0, oy = 0, sc = 1;
+      var drag = null;
+      var presets = {
+        identity: { i: [1, 0], j: [0, 1] },
+        reflect: { i: [-1, 0], j: [0, 1] },
+        rot: { i: [0, 1], j: [-1, 0] },
+        shear: { i: [1, 0], j: [0.8, 1] },
+        squash: { i: [1.2, 0.6], j: [0.8, 0.4] }
+      };
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function fmt(n) {
+        var sign = n < -0.004 ? "−" : "";
+        return sign + Math.abs(n).toFixed(2);
+      }
+      function toScreen(x, y) { return [ox + x * sc, oy - y * sc]; }
+
+      function render() {
+        var dpr = Math.min(2, window.devicePixelRatio || 1);
+        var w = canvas.clientWidth;
+        var h = canvas.clientHeight;
+        if (w < 2 || h < 2) return;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        var ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ox = w * 0.42;
+        oy = h * 0.6;
+        sc = Math.min(w, h) * 0.3;
+        var det = i.x * j.y - i.y * j.x;
+        var area = Math.abs(det);
+        var flat = area < 0.05;
+
+        ctx.clearRect(0, 0, w, h);
+        var minX = Math.floor(-ox / sc) - 1;
+        var maxX = Math.ceil((w - ox) / sc) + 1;
+        var minY = Math.floor((oy - h) / sc) - 1;
+        var maxY = Math.ceil(oy / sc) + 1;
+        var x, y;
+        ctx.lineWidth = 1;
+        for (x = minX; x <= maxX; x++) {
+          var px = ox + x * sc;
+          ctx.strokeStyle = x === 0 ? "rgba(26,31,26,0.9)" : "rgba(26,31,26,0.16)";
+          ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, h); ctx.stroke();
+        }
+        for (y = minY; y <= maxY; y++) {
+          var py = oy - y * sc;
+          ctx.strokeStyle = y === 0 ? "rgba(26,31,26,0.9)" : "rgba(26,31,26,0.16)";
+          ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(w, py); ctx.stroke();
+        }
+
+        ctx.save();
+        ctx.strokeStyle = "rgba(26,31,26,0.7)";
+        ctx.setLineDash([3, 4]);
+        ctx.beginPath();
+        ctx.arc(ox, oy, sc * 0.7, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        for (var deg = 0; deg < 360; deg += 15) {
+          var rad = deg * Math.PI / 180;
+          var inner = deg % 45 === 0 ? 12 : 6;
+          var r0 = sc * 0.7;
+          ctx.beginPath();
+          ctx.moveTo(ox + (r0 - inner) * Math.cos(rad), oy - (r0 - inner) * Math.sin(rad));
+          ctx.lineTo(ox + r0 * Math.cos(rad), oy - r0 * Math.sin(rad));
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        var p0 = toScreen(0, 0);
+        var pi = toScreen(i.x, i.y);
+        var pj = toScreen(j.x, j.y);
+        var pij = toScreen(i.x + j.x, i.y + j.y);
+        ctx.beginPath();
+        ctx.moveTo(p0[0], p0[1]);
+        ctx.lineTo(pi[0], pi[1]);
+        ctx.lineTo(pij[0], pij[1]);
+        ctx.lineTo(pj[0], pj[1]);
+        ctx.closePath();
+        ctx.fillStyle = flat ? "rgba(208,18,18,0.08)" : det < 0 ? "rgba(208,18,18,0.18)" : "rgba(26,31,26,0.06)";
+        ctx.fill();
+        ctx.strokeStyle = flat ? "#d01212" : "#1a1f1a";
+        ctx.lineWidth = 1.4;
+        if (flat) ctx.setLineDash([5, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.save();
+        ctx.setLineDash([2, 3]);
+        ctx.strokeStyle = "rgba(26,31,26,0.45)";
+        ctx.lineWidth = 1;
+        [[p0, pi], [p0, pj]].forEach(function (pair) {
+          var a = pair[0], b = pair[1];
+          var dx = b[0] - a[0], dy = b[1] - a[1];
+          var len = Math.hypot(dx, dy) || 1;
+          ctx.beginPath();
+          ctx.moveTo(b[0], b[1]);
+          ctx.lineTo(b[0] + dx / len * 42, b[1] + dy / len * 42);
+          ctx.stroke();
+        });
+        ctx.restore();
+
+        drawF(ctx);
+        shaft(ctx, p0, pi);
+        shaft(ctx, p0, pj);
+        square(ctx, pi);
+        square(ctx, pj);
+
+        ctx.fillStyle = "#1a1f1a";
+        ctx.font = "12px 'Space Mono', monospace";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText("i  " + fmt(i.x) + ",  " + fmt(i.y), pi[0] + 14, pi[1] - 10);
+        ctx.fillText("j  " + fmt(j.x) + ",  " + fmt(j.y), pj[0] + 14, pj[1] + 16);
+        dimension(ctx, p0, pi, fmt(Math.hypot(i.x, i.y)));
+
+        ctx.strokeStyle = "#1a1f1a";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(14, 14, 168, 52);
+        ctx.font = "12px 'Space Mono', monospace";
+        ctx.fillStyle = det < -0.05 ? "#d01212" : "#1a1f1a";
+        ctx.fillText("DET    " + fmt(det), 24, 36);
+        ctx.fillStyle = "#1a1f1a";
+        ctx.fillText("AREA   " + fmt(area), 24, 54);
+
+        detEl.textContent = fmt(det);
+        detEl.classList.toggle("neg", det < -0.05 || flat);
+        areaEl.textContent = fmt(area);
+        areaEl.classList.remove("neg");
+        mxEl.textContent = "[ " + fmt(i.x) + "   " + fmt(j.x) + " ]\n[ " + fmt(i.y) + "   " + fmt(j.y) + " ]";
+        noteEl.textContent = flat
+          ? "The determinant is zero. The F lies on a line. The area is zero."
+          : det < 0
+            ? "The determinant is negative. The F reads backwards."
+            : "The determinant is positive. The F reads forwards.";
+        document.querySelectorAll(".presets button").forEach(function (btn) {
+          var p = presets[btn.dataset.p];
+          var on = p && Math.abs(p.i[0] - i.x) < 0.02 && Math.abs(p.i[1] - i.y) < 0.02 && Math.abs(p.j[0] - j.x) < 0.02 && Math.abs(p.j[1] - j.y) < 0.02;
+          btn.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+      }
+
+      function drawF(ctx) {
+        var segs = [[[0.18, 0.2], [0.18, 0.8]], [[0.18, 0.8], [0.64, 0.8]], [[0.18, 0.5], [0.52, 0.5]]];
+        ctx.beginPath();
+        segs.forEach(function (seg) {
+          var a = seg[0], b = seg[1];
+          var p = toScreen(i.x * a[0] + j.x * a[1], i.y * a[0] + j.y * a[1]);
+          var q = toScreen(i.x * b[0] + j.x * b[1], i.y * b[0] + j.y * b[1]);
+          ctx.moveTo(p[0], p[1]);
+          ctx.lineTo(q[0], q[1]);
+        });
+        ctx.strokeStyle = "#d01212";
+        ctx.lineWidth = 2.75;
+        ctx.lineCap = "square";
+        ctx.stroke();
+      }
+
+      function shaft(ctx, a, b) {
+        var ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+        var endX = b[0] - 14 * Math.cos(ang);
+        var endY = b[1] - 14 * Math.sin(ang);
+        ctx.strokeStyle = "#1a1f1a";
+        ctx.fillStyle = "#1a1f1a";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(b[0] - 8 * Math.cos(ang), b[1] - 8 * Math.sin(ang));
+        ctx.lineTo(b[0] - 18 * Math.cos(ang - 0.38), b[1] - 18 * Math.sin(ang - 0.38));
+        ctx.lineTo(b[0] - 18 * Math.cos(ang + 0.38), b[1] - 18 * Math.sin(ang + 0.38));
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function square(ctx, p) {
+        ctx.strokeStyle = "#d01212";
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(p[0] - 6, p[1] - 6, 12, 12);
+      }
+
+      function dimension(ctx, a, b, label) {
+        var ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+        var nx = Math.cos(ang + Math.PI / 2);
+        var ny = Math.sin(ang + Math.PI / 2);
+        var off = 26;
+        var a2 = [a[0] + nx * off, a[1] + ny * off];
+        var b2 = [b[0] + nx * off, b[1] + ny * off];
+        ctx.save();
+        ctx.strokeStyle = "#d01212";
+        ctx.fillStyle = "#d01212";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1]); ctx.lineTo(a2[0] + nx * 8, a2[1] + ny * 8);
+        ctx.moveTo(b[0], b[1]); ctx.lineTo(b2[0] + nx * 8, b2[1] + ny * 8);
+        ctx.moveTo(a2[0], a2[1]); ctx.lineTo(b2[0], b2[1]);
+        ctx.stroke();
+        ctx.font = "11px 'Space Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(label, (a2[0] + b2[0]) / 2, (a2[1] + b2[1]) / 2 - 3);
+        ctx.restore();
+      }
+
+      function local(e) {
+        var r = canvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+      }
+
+      canvas.addEventListener("pointerdown", function (e) {
+        var p = local(e);
+        var pi = toScreen(i.x, i.y);
+        var pj = toScreen(j.x, j.y);
+        var di = Math.hypot(p.x - pi[0], p.y - pi[1]);
+        var dj = Math.hypot(p.x - pj[0], p.y - pj[1]);
+        if (Math.min(di, dj) > 28) return;
+        drag = di <= dj ? "i" : "j";
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener("pointermove", function (e) {
+        if (!drag) return;
+        var p = local(e);
+        var x = clamp((p.x - ox) / sc, -1.7, 1.7);
+        var y = clamp((oy - p.y) / sc, -1.7, 1.7);
+        if (drag === "i") { i.x = x; i.y = y; }
+        else { j.x = x; j.y = y; }
+        render();
+      });
+      canvas.addEventListener("pointerup", function () { drag = null; });
+      canvas.addEventListener("pointercancel", function () { drag = null; });
+
+      document.querySelectorAll(".presets button").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var p = presets[btn.dataset.p];
+          i.x = p.i[0]; i.y = p.i[1];
+          j.x = p.j[0]; j.y = p.j[1];
+          render();
+        });
+      });
+
+      window.addEventListener("resize", render);
+      render();
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+    })();
+  </script>
+</body>
+</html>

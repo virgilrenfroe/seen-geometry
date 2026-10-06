@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fold — Seen Geometry</title>
+  <meta name="description" content="A sheet folds across a crease. The fold is a reflection, so the mark flips and the determinant is −1.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,720&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="demo">
+  <div class="top">
+    <a class="back" href="index.html">Lessons</a>
+    <h1>Fold</h1>
+  </div>
+  <p class="lede">Drag the sheet. One half folds over the crease. A fold is a reflection.</p>
+  <div class="paper">
+    <canvas id="c" aria-label="A sheet of paper folding across a crease. The mark flips. The determinant is −1."></canvas>
+    <span class="dog" aria-hidden="true"></span>
+  </div>
+  <div class="controls">
+    <label class="tab">
+      <span>Crease</span> <b id="cang">28°</b>
+      <input id="ang" type="range" min="0" max="180" value="28">
+    </label>
+    <label class="tab">
+      <span>Fold</span> <b id="fdeg">58°</b>
+      <input id="fold" type="range" min="0" max="180" value="58">
+    </label>
+    <aside class="scrap">
+      <p class="eye">det = −1</p>
+      <p id="sentence">The sheet lifts along the crease. The mark flips.</p>
+      <pre id="mx"></pre>
+    </aside>
+  </div>
+  <p class="foot">This is a sample teaching page. <a href="https://github.com/virgilrenfroe/seen-geometry/blob/main/README.md">README</a>.</p>
+  <script>
+    (function () {
+      var canvas = document.getElementById("c");
+      var ang = document.getElementById("ang");
+      var foldInput = document.getElementById("fold");
+      var cang = document.getElementById("cang");
+      var fdeg = document.getElementById("fdeg");
+      var sentence = document.getElementById("sentence");
+      var mx = document.getElementById("mx");
+      var theta = 28 * Math.PI / 180;
+      var fold = 58 * Math.PI / 180;
+      var dx = 1, dy = 0, nx = 0, ny = 1;
+      var ox = 0, oy = 0, sc = 1;
+      var W = 1.35, H = 0.92;
+      var dragging = false;
+      var lastX = 0, lastY = 0;
+
+      function fmt(n) { return (n < -0.004 ? "−" : n < 0 ? "−" : "") + Math.abs(n).toFixed(2); }
+      function signed(x, y) { return x * nx + y * ny; }
+      function syncBasis() {
+        theta = ang.value * Math.PI / 180;
+        fold = foldInput.value * Math.PI / 180;
+        dx = Math.cos(theta); dy = Math.sin(theta);
+        nx = -dy; ny = dx;
+        cang.textContent = Math.round(ang.value) + "°";
+        fdeg.textContent = Math.round(foldInput.value) + "°";
+      }
+      function screen(p) { return [ox + p[0] * sc, oy - p[1] * sc]; }
+      function foldPoint(p) {
+        var h = signed(p[0], p[1]);
+        if (h <= 0) return p.slice();
+        var c = Math.cos(fold);
+        return [p[0] - h * nx * (1 - c), p[1] - h * ny * (1 - c)];
+      }
+      function reflectPoint(p) {
+        var h = signed(p[0], p[1]);
+        return [p[0] - 2 * h * nx, p[1] - 2 * h * ny];
+      }
+      function half(positive) {
+        var c = [[-W, -H], [W, -H], [W, H], [-W, H]];
+        var inside = function (p) {
+          var h = signed(p[0], p[1]);
+          return positive ? h >= -1e-4 : h <= 1e-4;
+        };
+        var out = [];
+        for (var i = 0; i < 4; i++) {
+          var a = c[i], b = c[(i + 1) % 4];
+          var ia = inside(a), ib = inside(b);
+          var hit = function () {
+            var ha = signed(a[0], a[1]), hb = signed(b[0], b[1]);
+            var t = ha / (ha - hb);
+            return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+          };
+          if (ia && ib) out.push(b);
+          else if (ia && !ib) out.push(hit());
+          else if (!ia && ib) { out.push(hit()); out.push(b); }
+        }
+        return out;
+      }
+      function trace(ctx, pts) {
+        ctx.beginPath();
+        pts.forEach(function (p, i) {
+          var q = screen(p);
+          if (i === 0) ctx.moveTo(q[0], q[1]);
+          else ctx.lineTo(q[0], q[1]);
+        });
+        ctx.closePath();
+      }
+      function creaseHits() {
+        var edges = [[[-W, -H], [W, -H]], [[W, -H], [W, H]], [[W, H], [-W, H]], [[-W, H], [-W, -H]]];
+        var D = [dx, dy];
+        var hits = [];
+        edges.forEach(function (edge) {
+          var a = edge[0], b = edge[1];
+          var S = [b[0] - a[0], b[1] - a[1]];
+          var rxs = D[0] * S[1] - D[1] * S[0];
+          if (Math.abs(rxs) < 1e-8) return;
+          var t = (a[0] * S[1] - a[1] * S[0]) / rxs;
+          var u = (a[0] * D[1] - a[1] * D[0]) / rxs;
+          if (u >= -1e-3 && u <= 1 + 1e-3) hits.push([t * D[0], t * D[1]]);
+        });
+        return hits;
+      }
+      function drawMark(ctx, map, color, width, alpha) {
+        var mark = [nx * 0.52 + dx * 0.08, ny * 0.52 + dy * 0.02];
+        var segs = [[[0, 0], [0, 0.36]], [[0, 0.36], [0.26, 0.36]], [[0, 0.17], [0.2, 0.17]]];
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        segs.forEach(function (seg) {
+          var p = screen(map([mark[0] + seg[0][0], mark[1] + seg[0][1]]));
+          var q = screen(map([mark[0] + seg[1][0], mark[1] + seg[1][1]]));
+          ctx.moveTo(p[0], p[1]);
+          ctx.lineTo(q[0], q[1]);
+        });
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineCap = "square";
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function render() {
+        syncBasis();
+        var dpr = Math.min(2, window.devicePixelRatio || 1);
+        var w = canvas.clientWidth, h = canvas.clientHeight;
+        if (w < 2 || h < 2) return;
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        var ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ox = w * 0.5;
+        oy = h * 0.52;
+        sc = Math.min(w, h) * 0.42;
+        ctx.clearRect(0, 0, w, h);
+
+        var base = [[-W, -H], [W, -H], [W, H], [-W, H]];
+        ctx.save();
+        ctx.translate(7, 10);
+        trace(ctx, base);
+        ctx.fillStyle = "#c5daf0";
+        ctx.fill();
+        ctx.restore();
+
+        var still = half(false);
+        var moving = half(true).map(foldPoint);
+        var cos = Math.cos(fold);
+        trace(ctx, still);
+        ctx.fillStyle = "#fffdf8";
+        ctx.fill();
+        var light = ctx.createLinearGradient(0, 0, 0, h * 0.7);
+        light.addColorStop(0, "rgba(255,255,255,0.55)");
+        light.addColorStop(1, "rgba(255,255,255,0)");
+        trace(ctx, still);
+        ctx.fillStyle = light;
+        ctx.fill();
+
+        trace(ctx, moving);
+        ctx.fillStyle = cos < 0 ? "#d5e7f4" : "rgba(255,253,248,0.96)";
+        ctx.fill();
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "#b7d0e6";
+        ctx.stroke();
+        trace(ctx, moving);
+        ctx.fillStyle = cos < 0 ? "#d7e8f5" : "#fffdf8";
+        ctx.fill();
+
+        var hits = creaseHits();
+        if (hits.length >= 2) {
+          var a = screen(hits[0]), b = screen(hits[1]);
+          ctx.beginPath();
+          ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+          ctx.strokeStyle = "rgba(30,50,70,0.45)";
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(a[0] + 1.5, a[1] + 1); ctx.lineTo(b[0] + 1.5, b[1] + 1);
+          ctx.strokeStyle = "rgba(255,255,255,0.85)";
+          ctx.lineWidth = 1.25;
+          ctx.stroke();
+        }
+
+        var ghost = Math.max(0, 0.4 * (1 - fold / Math.PI));
+        drawMark(ctx, reflectPoint, "#1b2430", 2, ghost);
+        drawMark(ctx, foldPoint, "#c23b3b", 3.2, 1);
+
+        var two = 2 * theta;
+        var a11 = Math.cos(two), a12 = Math.sin(two);
+        mx.textContent = "[ " + fmt(a11) + "   " + fmt(a12) + " ]\n[ " + fmt(a12) + "   " + fmt(-a11) + " ]";
+        var deg = fold * 180 / Math.PI;
+        sentence.textContent = deg < 8
+          ? "The sheet is flat. The determinant is −1."
+          : deg < 90
+            ? "The sheet lifts along the crease. The mark flips."
+            : "You see the other side of the paper. The determinant is still −1.";
+      }
+
+      ang.addEventListener("input", render);
+      foldInput.addEventListener("input", render);
+      canvas.addEventListener("pointerdown", function (e) {
+        dragging = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener("pointermove", function (e) {
+        if (!dragging) return;
+        var mxv = e.clientX - lastX;
+        var myv = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        if (Math.abs(mxv) > Math.abs(myv)) {
+          ang.value = Math.max(0, Math.min(180, Number(ang.value) + mxv * 0.35));
+        } else {
+          foldInput.value = Math.max(0, Math.min(180, Number(foldInput.value) + myv * 0.45));
+        }
+        render();
+      });
+      function stop() { dragging = false; }
+      canvas.addEventListener("pointerup", stop);
+      canvas.addEventListener("pointercancel", stop);
+      window.addEventListener("resize", render);
+      render();
+    })();
+  </script>
+</body>
+</html>
