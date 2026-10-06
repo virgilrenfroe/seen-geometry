@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inverse — Seen Geometry</title>
+  <meta name="description" content="Apply a matrix to a shape, then apply its inverse. The product is the identity. A determinant of 0 has no inverse.">
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">11 · Inverse</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="An F on the unit square. A matrix moves it. The inverse moves it back."></canvas>
+    <div class="stamps">
+      <p data-kind="point" id="stamp-stage">M</p>
+      <p data-kind="dir" id="stamp-det">det 1.00</p>
+    </div>
+  </div>
+  <section class="dock" aria-label="Inverse">
+    <p class="index-no">11</p>
+    <h1>Undo the matrix</h1>
+    <p class="lede">A matrix moves the F. Its inverse moves the F back. The product of a matrix and its inverse is the identity. The identity leaves every point where it was.</p>
+    <div class="orders" role="group" aria-label="Which matrix">
+      <button type="button" data-kind="shear" aria-pressed="true">Shear</button>
+      <button type="button" data-kind="turn" aria-pressed="false">Turn</button>
+      <button type="button" data-kind="scale" aria-pressed="false">Scale</button>
+      <button type="button" data-kind="flat" aria-pressed="false">Flatten</button>
+    </div>
+    <p id="blurb">M is a shear. Slide to 1 to apply M. Slide on to 2 to apply the inverse. The F returns.</p>
+    <label class="field">
+      <span>Apply <output id="apply-out">M</output></span>
+      <input id="apply" type="range" min="0" max="2" step="0.01" value="1" aria-valuetext="M">
+    </label>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch"></span><span>(0, 1)</span><span id="point-out">—</span></li>
+      <li><span class="swatch clay"></span><span>Product</span><span id="prod-out">—</span></li>
+      <li><span class="swatch navy"></span><span>det</span><span id="det-out">—</span></li>
+    </ul>
+    <p class="fine" id="fine">Read M, then M inverse, then the product. The product is the identity when an inverse exists. If the determinant is 0, there is no inverse. <a href="06-determinant.html">Lesson 06</a> squashes a shape onto a line. <a href="09-projection.html">Lesson 09</a> flattens a house onto a plane. The lost direction does not come back.</p>
+    <table class="matrix measure" id="matrix-m">
+      <caption>M. Read each row from left to right.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <table class="matrix measure" id="matrix-inv">
+      <caption>M⁻¹. This is the inverse of M.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <table class="matrix measure" id="matrix-prod">
+      <caption>M times M⁻¹. This product is the identity when the inverse exists.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>A CAD program stores the placement of a part as a matrix. The inverse puts points back into the part's own axes. A mechanical designer uses that after a part has been moved.</li>
+        <li>A game camera uses a matrix to see the world from the camera. The inverse carries a point from the camera back into the world. A graphics programmer sets that up.</li>
+        <li>In a mathematics class, the Hill cipher is a historical example. Letters are encrypted by a matrix and decrypted by its inverse. It is a teaching cipher from 1929, not a modern one.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="10-perspective.html">Perspective</a> · <a href="12-eigenvectors.html">Next: eigenvectors</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html">09 Projection</a>
+      <a href="10-perspective.html">10 Perspective</a>
+      <a href="11-inverse.html" aria-current="page">11 Inverse</a>
+      <a href="12-eigenvectors.html">12 Eigenvectors</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="11-inverse.html" tabindex="-1" aria-hidden="true">11 Inverse</a>
+      <a class="reel-clone" href="12-eigenvectors.html" tabindex="-1" aria-hidden="true">12 Eigenvectors</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const applyInput = document.getElementById('apply');
+    const blurb = document.getElementById('blurb');
+    const factors = document.getElementById('factors');
+    const buttons = Array.from(document.querySelectorAll('.orders button'));
+
+    const INK = 0x1a1f1a;
+    const PENCIL = 0x5c665c;
+    const PAPER = 0xe7efe4;
+    const I2 = [1, 0, 0, 1];
+
+    function turn(deg) {
+      const t = deg * Math.PI / 180;
+      const c = Math.cos(t);
+      const s = Math.sin(t);
+      return [c, -s, s, c];
+    }
+
+    const PRESETS = {
+      shear: [1, 0.5, 0, 1],
+      turn: turn(40),
+      scale: [1.8, 0, 0, 0.55],
+      flat: [1.2, 0.8, 0.6, 0.4]
+    };
+
+    let kind = 'shear';
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function detOf(m) {
+      return m[0] * m[3] - m[1] * m[2];
+    }
+
+    function mul(a, b) {
+      return [
+        a[0] * b[0] + a[1] * b[2], a[0] * b[1] + a[1] * b[3],
+        a[2] * b[0] + a[3] * b[2], a[2] * b[1] + a[3] * b[3]
+      ];
+    }
+
+    function mix(a, b, t) {
+      return a.map((value, index) => (1 - t) * value + t * b[index]);
+    }
+
+    function inverseOf(m) {
+      const det = detOf(m);
+      if (Math.abs(det) < 1e-8) return null;
+      return [m[3] / det, -m[1] / det, -m[2] / det, m[0] / det];
+    }
+
+    function makeF() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0.16, 0.12);
+      shape.lineTo(0.38, 0.12);
+      shape.lineTo(0.38, 0.42);
+      shape.lineTo(0.68, 0.42);
+      shape.lineTo(0.68, 0.58);
+      shape.lineTo(0.38, 0.58);
+      shape.lineTo(0.38, 0.72);
+      shape.lineTo(0.84, 0.72);
+      shape.lineTo(0.84, 0.90);
+      shape.lineTo(0.16, 0.90);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function squareGeometry() {
+      const square = new THREE.Shape();
+      square.moveTo(0, 0);
+      square.lineTo(1, 0);
+      square.lineTo(1, 1);
+      square.lineTo(0, 1);
+      square.closePath();
+      return new THREE.ShapeGeometry(square);
+    }
+
+    function toMatrix4(m) {
+      const out = new THREE.Matrix4();
+      out.set(
+        m[0], m[1], 0, 0,
+        m[2], m[3], 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+      );
+      return out;
+    }
+
+    function fillTable(table, values, hot) {
+      const body = table.tBodies[0];
+      for (let i = 0; i < 4; i += 1) {
+        const cell = body.rows[Math.floor(i / 2)].cells[i % 2];
+        cell.textContent = values ? fmt(values[i]) : '—';
+        const onDiagonal = i === 0 || i === 3;
+        const identityCell = values && Math.abs(values[i] - (onDiagonal ? 1 : 0)) < 0.02;
+        cell.classList.toggle('is-hot', Boolean(hot && identityCell && onDiagonal));
+      }
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+      const camera = new THREE.OrthographicCamera(-3, 3, 3, -3, 0.1, 30);
+      camera.position.set(0, 0, 10);
+      camera.lookAt(0, 0, 0);
+
+      const grid = new THREE.GridHelper(6, 6, INK, 0xb7c0b4);
+      grid.rotation.x = Math.PI / 2;
+      grid.position.z = -0.05;
+      scene.add(grid);
+
+      const ghost = new THREE.Group();
+      ghost.matrixAutoUpdate = false;
+      const ghostFill = new THREE.Mesh(
+        squareGeometry(),
+        new THREE.MeshBasicMaterial({ color: 0xd5ddd0, side: THREE.DoubleSide })
+      );
+      const ghostLetter = new THREE.Mesh(
+        makeF(),
+        new THREE.MeshBasicMaterial({ color: PENCIL, side: THREE.DoubleSide })
+      );
+      ghostLetter.position.z = 0.01;
+      ghost.add(ghostFill, ghostLetter);
+      scene.add(ghost);
+
+      const world = new THREE.Group();
+      world.matrixAutoUpdate = false;
+      const fillMat = new THREE.MeshBasicMaterial({ color: 0xd7e0d2, side: THREE.DoubleSide, transparent: true, opacity: 0.92 });
+      const fill = new THREE.Mesh(squareGeometry(), fillMat);
+      fill.position.z = 0.02;
+      const letter = new THREE.Mesh(
+        makeF(),
+        new THREE.MeshBasicMaterial({ color: INK, side: THREE.DoubleSide })
+      );
+      letter.position.z = 0.04;
+      world.add(fill, letter);
+      scene.add(world);
+
+      const outline = new THREE.LineLoop(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute([
+          0, 0, 0.03, 1, 0, 0.03, 1, 1, 0.03, 0, 1, 0.03
+        ], 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      ghost.add(outline);
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        const aspect = width / height;
+        let halfW = 2.15;
+        let halfH = 2.15;
+        if (halfW / halfH < aspect) halfW = halfH * aspect;
+        else halfH = halfW / aspect;
+        camera.left = -0.55 - (halfW - 1.1);
+        camera.right = camera.left + halfW * 2;
+        camera.top = 0.15 + halfH * 1.15;
+        camera.bottom = camera.top - halfH * 2;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function sync() {
+        frame();
+        const preset = PRESETS[kind];
+        const singular = Math.abs(detOf(preset)) < 1e-8;
+        applyInput.max = singular ? '1' : '2';
+        if (singular && Number(applyInput.value) > 1) applyInput.value = '1';
+        const u = Number(applyInput.value);
+        const inv = inverseOf(preset);
+        let applied = preset;
+        if (u <= 1) applied = mix(I2, preset, u);
+        else applied = mul(mix(I2, inv, u - 1), preset);
+
+        const det = detOf(preset);
+        const product = inv ? mul(preset, inv) : null;
+        ghost.matrix.identity();
+        world.matrix.copy(toMatrix4(applied));
+        world.matrixWorldNeedsUpdate = true;
+        fillMat.color.setHex(Math.abs(det) < 0.02 ? 0xd5ddd0 : det < 0 ? 0xf0c8c4 : 0xd7e0d2);
+
+        let stageName = 'M';
+        if (u < 0.05) stageName = 'Original';
+        else if (!singular && u > 1.05 && u < 1.95) stageName = 'Inverse';
+        else if (!singular && u >= 1.95) stageName = 'Undone';
+        else if (u < 0.95) stageName = 'Applying M';
+        document.getElementById('stamp-stage').textContent = stageName;
+        document.getElementById('stamp-det').textContent = 'det ' + fmt(det);
+        document.getElementById('apply-out').textContent = stageName;
+        applyInput.setAttribute('aria-valuetext', stageName);
+
+        if (singular) {
+          blurb.textContent = 'The determinant is 0. The F falls onto a line. There is no inverse, so the slider cannot undo this.';
+        } else if (u < 0.05) {
+          blurb.textContent = 'The F is in its original place. Slide to the right to apply M.';
+        } else if (u < 0.95) {
+          blurb.textContent = 'M is taking hold. At the middle of the slider, M is fully applied.';
+        } else if (u <= 1.05) {
+          blurb.textContent = 'M is fully applied. Slide further to apply the inverse. The F will return.';
+        } else if (u < 1.95) {
+          blurb.textContent = 'The inverse is undoing M. The product of M and its inverse is still the identity.';
+        } else {
+          blurb.textContent = 'The inverse has undone M. The F is back. The product is the identity.';
+        }
+
+        const point = [applied[1], applied[3]];
+        factors.textContent =
+          'M          ' + fmt(preset[0]) + '   ' + fmt(preset[1]) + '\n' +
+          '           ' + fmt(preset[2]) + '   ' + fmt(preset[3]) + '\n' +
+          'M inverse  ' + (inv ? fmt(inv[0]) + '   ' + fmt(inv[1]) + '\n' + '           ' + fmt(inv[2]) + '   ' + fmt(inv[3]) : 'none') + '\n' +
+          'product    ' + (product ? fmt(product[0]) + '   ' + fmt(product[1]) + '\n' + '           ' + fmt(product[2]) + '   ' + fmt(product[3]) : 'none');
+        document.getElementById('point-out').textContent = fmt(point[0]) + ',  ' + fmt(point[1]);
+        document.getElementById('prod-out').textContent = product
+          ? fmt(product[0]) + '  ' + fmt(product[1]) + '  ' + fmt(product[2]) + '  ' + fmt(product[3])
+          : 'none';
+        document.getElementById('det-out').textContent = fmt(det);
+        fillTable(document.getElementById('matrix-m'), preset, false);
+        fillTable(document.getElementById('matrix-inv'), inv, false);
+        fillTable(document.getElementById('matrix-prod'), product, true);
+        buttons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.kind === kind));
+        });
+        renderer.render(scene, camera);
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          kind = button.dataset.kind;
+          if (kind !== 'flat' && Number(applyInput.value) === 0) applyInput.value = '1';
+          sync();
+        });
+      });
+      applyInput.addEventListener('input', sync);
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>

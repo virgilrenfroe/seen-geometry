@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eigenvectors — Seen Geometry</title>
+  <meta name="description" content="A field of arrows under a 2×2 matrix. Eigen-directions stay on their own line and stretch by λ. A turn has no real eigenvector.">
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">12 · Eigenvectors</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="A field of arrows. Most arrows turn. The red arrows stay on their own line and stretch."></canvas>
+    <div class="stamps">
+      <p data-kind="point" id="stamp-l1">λ 3.00</p>
+      <p data-kind="dir" id="stamp-l2">λ 1.00</p>
+    </div>
+  </div>
+  <section class="dock" aria-label="Eigenvectors">
+    <p class="index-no">12</p>
+    <h1>Directions that stay</h1>
+    <p class="lede">Most arrows turn when the matrix acts. A few stay on their own line. Those directions only stretch or shrink. The stretch factor is λ.</p>
+    <div class="orders" role="group" aria-label="Example matrices">
+      <button type="button" data-preset="stretch" aria-pressed="true">Stretch</button>
+      <button type="button" data-preset="axes" aria-pressed="false">Axes</button>
+      <button type="button" data-preset="turn" aria-pressed="false">Turn</button>
+    </div>
+    <p id="blurb">The red arrows lie on two lines. One line stretches by 3. The other stretches by 1. The ink arrows turn off their lines.</p>
+    <label class="field">
+      <span>a <output id="a-out">2.00</output></span>
+      <input id="a" type="range" min="-2" max="2" step="0.01" value="2">
+    </label>
+    <label class="field">
+      <span>b <output id="b-out">1.00</output></span>
+      <input id="b" type="range" min="-2" max="2" step="0.01" value="1">
+    </label>
+    <label class="field">
+      <span>c <output id="c-out">1.00</output></span>
+      <input id="c" type="range" min="-2" max="2" step="0.01" value="1">
+    </label>
+    <label class="field">
+      <span>d <output id="d-out">2.00</output></span>
+      <input id="d" type="range" min="-2" max="2" step="0.01" value="2">
+    </label>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch clay"></span><span>λ1</span><span id="l1-out">3.00</span></li>
+      <li><span class="swatch clay"></span><span>λ2</span><span id="l2-out">1.00</span></li>
+      <li><span class="swatch navy"></span><span>Lines</span><span id="line-out">two</span></li>
+    </ul>
+    <p class="fine">The matrix is the block of sliders, row by row: a b, then c d. A negative λ flips the arrow along that same line. A turn has no real eigenvector, so every arrow leaves its line.</p>
+    <table class="matrix measure" id="matrix">
+      <caption>2×2 matrix. Read each row from left to right. The columns move the arrows.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>The original PageRank method ranks a web page with an eigenvector of the link matrix. A search engineer reads that score as the page's importance.</li>
+        <li>In data science, principal component analysis finds the directions where measurements spread the most. Those directions are eigenvectors. A data scientist uses them to simplify a table.</li>
+        <li>A structural engineer finds the vibration modes of a building or a bridge. Each mode is an eigenvector. The matching factor sets how fast that mode shakes.</li>
+        <li>A mechanical engineer finds the principal axes of stress. They are the eigenvectors of the stress matrix, in three dimensions. Pull and push act along those axes.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="11-inverse.html">Inverse</a> · <a href="../index.html">Lessons</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html">09 Projection</a>
+      <a href="10-perspective.html">10 Perspective</a>
+      <a href="11-inverse.html">11 Inverse</a>
+      <a href="12-eigenvectors.html" aria-current="page">12 Eigenvectors</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="11-inverse.html" tabindex="-1" aria-hidden="true">11 Inverse</a>
+      <a class="reel-clone" href="12-eigenvectors.html" tabindex="-1" aria-hidden="true">12 Eigenvectors</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const narrowQuery = window.matchMedia('(max-width: 760px)');
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const blurb = document.getElementById('blurb');
+    const factors = document.getElementById('factors');
+    const matrixTable = document.getElementById('matrix');
+    const buttons = Array.from(document.querySelectorAll('.orders button'));
+    const sliders = {
+      a: document.getElementById('a'),
+      b: document.getElementById('b'),
+      c: document.getElementById('c'),
+      d: document.getElementById('d')
+    };
+
+    const INK = new THREE.Color(0x1a1f1a);
+    const PENCIL = new THREE.Color(0x5c665c);
+    const SIGNAL = new THREE.Color(0xd01212);
+    const PAPER = 0xe7efe4;
+
+    const PRESETS = {
+      stretch: [2, 1, 1, 2],
+      axes: [2, 0, 0, 0.5],
+      turn: [0.82, -0.57, 0.57, 0.82]
+    };
+
+    let presetName = 'stretch';
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function eigenvec(a, b, c, d, lambda) {
+      const a1 = a - lambda;
+      const d1 = d - lambda;
+      let x;
+      let y;
+      if (Math.hypot(b, a1) > 1e-8) {
+        x = b;
+        y = -a1;
+      } else if (Math.hypot(d1, c) > 1e-8) {
+        x = d1;
+        y = -c;
+      } else {
+        x = 1;
+        y = 0;
+      }
+      const n = Math.hypot(x, y) || 1;
+      return [x / n, y / n];
+    }
+
+    function eigen(a, b, c, d) {
+      const tr = a + d;
+      const det = a * d - b * c;
+      const disc = tr * tr - 4 * det;
+      const scalar = Math.abs(b) < 1e-6 && Math.abs(c) < 1e-6 && Math.abs(a - d) < 1e-6;
+      if (disc < -1e-6) return { real: false, det, scalar: false };
+      const s = Math.sqrt(Math.max(0, disc));
+      const l1 = (tr + s) / 2;
+      const l2 = (tr - s) / 2;
+      const v1 = eigenvec(a, b, c, d, l1);
+      const v2 = eigenvec(a, b, c, d, l2);
+      const same = Math.abs(v1[0] * v2[0] + v1[1] * v2[1]) > 0.98;
+      return { real: true, det, l1, l2, v1, v2, same, scalar };
+    }
+
+    function makeArrow() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0.11);
+      shape.lineTo(0.72, 0.11);
+      shape.lineTo(0.72, 0.26);
+      shape.lineTo(1, 0);
+      shape.lineTo(0.72, -0.26);
+      shape.lineTo(0.72, -0.11);
+      shape.lineTo(0, -0.11);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+      const camera = new THREE.OrthographicCamera(-3, 3, 3, -3, 0.1, 30);
+      camera.position.set(0, 0, 10);
+      camera.lookAt(0, 0, 0);
+
+      const grid = new THREE.GridHelper(8, 8, 0x1a1f1a, 0xb7c0b4);
+      grid.rotation.x = Math.PI / 2;
+      grid.position.z = -0.06;
+      scene.add(grid);
+
+      const circlePts = [];
+      for (let i = 0; i < 64; i += 1) {
+        const t = (i / 64) * Math.PI * 2;
+        circlePts.push(Math.cos(t), Math.sin(t), 0);
+      }
+      const circle = new THREE.LineLoop(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute(circlePts, 3)),
+        new THREE.LineBasicMaterial({ color: 0xb7c0b4 })
+      );
+      circle.position.z = -0.02;
+      scene.add(circle);
+
+      const lineGeom = new THREE.BufferGeometry();
+      lineGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(4 * 3), 3));
+      const eigenLines = new THREE.LineSegments(lineGeom, new THREE.LineBasicMaterial({ color: 0xd01212 }));
+      eigenLines.frustumCulled = false;
+      scene.add(eigenLines);
+
+      const arrowGeo = makeArrow();
+      const fieldMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+      const field = new THREE.InstancedMesh(arrowGeo, fieldMat, 40);
+      field.frustumCulled = false;
+      scene.add(field);
+      const eigenMat = new THREE.MeshBasicMaterial({ color: 0xd01212, side: THREE.DoubleSide });
+      const eigenArrows = new THREE.InstancedMesh(arrowGeo, eigenMat, 2);
+      eigenArrows.frustumCulled = false;
+      scene.add(eigenArrows);
+
+      const dummy = new THREE.Object3D();
+
+      function placeArrow(mesh, index, ox, oy, vx, vy, thick, z) {
+        const len = Math.hypot(vx, vy);
+        const ux = len < 1e-6 ? 1 : vx / len;
+        const uy = len < 1e-6 ? 0 : vy / len;
+        const draw = Math.min(Math.max(len, 0.001), 2.7);
+        dummy.matrix.set(
+          ux * draw, -uy * thick, 0, ox,
+          uy * draw, ux * thick, 0, oy,
+          0, 0, 1, z,
+          0, 0, 0, 1
+        );
+        mesh.setMatrixAt(index, dummy.matrix);
+      }
+
+      function hideArrow(mesh, index) {
+        dummy.matrix.makeScale(0, 0, 0);
+        mesh.setMatrixAt(index, dummy.matrix);
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        const aspect = width / height;
+        let half = 3.15;
+        let halfW = half;
+        let halfH = half;
+        if (halfW / halfH < aspect) halfW = halfH * aspect;
+        else halfH = halfW / aspect;
+        camera.left = -halfW;
+        camera.right = halfW;
+        camera.top = halfH;
+        camera.bottom = -halfH;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function readM() {
+        return [
+          Number(sliders.a.value),
+          Number(sliders.b.value),
+          Number(sliders.c.value),
+          Number(sliders.d.value)
+        ];
+      }
+
+      function applyTo(m, x, y) {
+        return [m[0] * x + m[1] * y, m[2] * x + m[3] * y];
+      }
+
+      function nearEigen(x, y, info) {
+        if (!info.real) return false;
+        if (info.scalar) return true;
+        const n = Math.hypot(x, y) || 1;
+        const ux = x / n;
+        const uy = y / n;
+        const dirs = info.same ? [info.v1] : [info.v1, info.v2];
+        return dirs.some((v) => Math.abs(ux * v[0] + uy * v[1]) > 0.93);
+      }
+
+      function sync() {
+        frame();
+        const m = readM();
+        const info = eigen(m[0], m[1], m[2], m[3]);
+        const narrow = narrowQuery.matches;
+        const step = narrow ? 1 : 0.75;
+        const reach = narrow ? 1 : 1.5;
+        let index = 0;
+        for (let y = -reach; y <= reach + 1e-6; y += step) {
+          for (let x = -reach; x <= reach + 1e-6; x += step) {
+            if (Math.hypot(x, y) < 0.2) continue;
+            if (index >= field.count) break;
+            const image = applyTo(m, x, y);
+            const red = nearEigen(x, y, info);
+            const len = Math.hypot(image[0], image[1]) || 1;
+            const scale = 0.34;
+            placeArrow(field, index, x, y, image[0] / len * scale, image[1] / len * scale, 0.09, 0.01);
+            field.setColorAt(index, red ? SIGNAL : INK);
+            index += 1;
+          }
+        }
+        for (let i = index; i < field.count; i += 1) {
+          hideArrow(field, i);
+          field.setColorAt(i, PENCIL);
+        }
+        field.instanceMatrix.needsUpdate = true;
+        if (field.instanceColor) field.instanceColor.needsUpdate = true;
+
+        const lineArr = eigenLines.geometry.getAttribute('position').array;
+        lineArr.fill(0);
+        if (info.real && !info.scalar) {
+          const dirs = info.same ? [info.v1] : [info.v1, info.v2];
+          dirs.forEach((v, i) => {
+            const o = i * 6;
+            lineArr[o] = -v[0] * 2.8;
+            lineArr[o + 1] = -v[1] * 2.8;
+            lineArr[o + 3] = v[0] * 2.8;
+            lineArr[o + 4] = v[1] * 2.8;
+            const length = Math.abs(i === 0 ? info.l1 : info.l2);
+            const sign = (i === 0 ? info.l1 : info.l2) < 0 ? -1 : 1;
+            placeArrow(eigenArrows, i, 0, 0, sign * v[0] * length, sign * v[1] * length, 0.12, 0.04);
+          });
+          if (info.same) hideArrow(eigenArrows, 1);
+        } else {
+          hideArrow(eigenArrows, 0);
+          hideArrow(eigenArrows, 1);
+        }
+        eigenLines.geometry.getAttribute('position').needsUpdate = true;
+        eigenArrows.instanceMatrix.needsUpdate = true;
+
+        document.getElementById('a-out').textContent = fmt(m[0]);
+        document.getElementById('b-out').textContent = fmt(m[1]);
+        document.getElementById('c-out').textContent = fmt(m[2]);
+        document.getElementById('d-out').textContent = fmt(m[3]);
+
+        const body = matrixTable.tBodies[0];
+        for (let i = 0; i < 4; i += 1) {
+          body.rows[Math.floor(i / 2)].cells[i % 2].textContent = fmt(m[i]);
+        }
+
+        if (!info.real) {
+          document.getElementById('stamp-l1').textContent = 'No real line';
+          document.getElementById('stamp-l2').textContent = 'Every arrow turns';
+          document.getElementById('l1-out').textContent = 'none';
+          document.getElementById('l2-out').textContent = 'none';
+          document.getElementById('line-out').textContent = 'none';
+          blurb.textContent = 'This matrix is a turn. Every arrow leaves its line. There is no real eigenvector.';
+          factors.textContent = 'λ   none\nEvery arrow turns.';
+        } else if (info.scalar) {
+          document.getElementById('stamp-l1').textContent = 'λ ' + fmt(info.l1);
+          document.getElementById('stamp-l2').textContent = 'Every line';
+          document.getElementById('l1-out').textContent = fmt(info.l1);
+          document.getElementById('l2-out').textContent = fmt(info.l2);
+          document.getElementById('line-out').textContent = 'every';
+          blurb.textContent = 'Every arrow stays on its own line. The factor λ is the same for every direction.';
+          factors.textContent = 'λ   ' + fmt(info.l1) + '   on every line';
+        } else if (info.same) {
+          document.getElementById('stamp-l1').textContent = 'λ ' + fmt(info.l1);
+          document.getElementById('stamp-l2').textContent = 'One line';
+          document.getElementById('l1-out').textContent = fmt(info.l1);
+          document.getElementById('l2-out').textContent = fmt(info.l2);
+          document.getElementById('line-out').textContent = 'one';
+          blurb.textContent = 'One line stays. Arrows on that line only stretch. The other arrows slide off their lines.';
+          factors.textContent =
+            'λ1  ' + fmt(info.l1) + '   along  ' + fmt(info.v1[0]) + ',  ' + fmt(info.v1[1]) + '\n' +
+            'λ2  ' + fmt(info.l2);
+        } else {
+          document.getElementById('stamp-l1').textContent = 'λ ' + fmt(info.l1);
+          document.getElementById('stamp-l2').textContent = 'λ ' + fmt(info.l2);
+          document.getElementById('l1-out').textContent = fmt(info.l1);
+          document.getElementById('l2-out').textContent = fmt(info.l2);
+          document.getElementById('line-out').textContent = 'two';
+          const flip = info.l1 < -0.005 || info.l2 < -0.005;
+          blurb.textContent = flip
+            ? 'The red arrows stay on two lines. A negative λ flips an arrow along its line. The ink arrows turn.'
+            : 'The red arrows stay on two lines. They only stretch, by ' + fmt(info.l1) + ' and by ' + fmt(info.l2) + '. The ink arrows turn.';
+          factors.textContent =
+            'λ1  ' + fmt(info.l1) + '   along  ' + fmt(info.v1[0]) + ',  ' + fmt(info.v1[1]) + '\n' +
+            'λ2  ' + fmt(info.l2) + '   along  ' + fmt(info.v2[0]) + ',  ' + fmt(info.v2[1]);
+        }
+
+        buttons.forEach((button) => {
+          const values = PRESETS[button.dataset.preset];
+          const on = presetName === button.dataset.preset
+            && values.every((value, i) => Math.abs(value - m[i]) < 0.011);
+          button.setAttribute('aria-pressed', String(on));
+        });
+        renderer.render(scene, camera);
+      }
+
+      Object.values(sliders).forEach((input) => {
+        input.addEventListener('input', () => {
+          presetName = '';
+          sync();
+        });
+      });
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const values = PRESETS[button.dataset.preset];
+          ['a', 'b', 'c', 'd'].forEach((key, index) => {
+            sliders[key].value = String(values[index]);
+          });
+          presetName = button.dataset.preset;
+          sync();
+        });
+      });
+      narrowQuery.addEventListener('change', sync);
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>
