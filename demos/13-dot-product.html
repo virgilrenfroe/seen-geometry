@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dot product — Seen Geometry</title>
+  <meta name="description" content="Drag two arrows. Their dot product is the lengths times the cosine of the angle. The red measure is the shadow of one arrow on the other.">
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">13 · Dot product</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="Two arrows on graph paper. Drag either tip. A protractor shows the angle. A red dimension marks the shadow of a on b."></canvas>
+    <div class="stamps">
+      <p data-kind="dir" id="stamp-a">Arrow a</p>
+      <p data-kind="point" id="stamp-dot">a·b 6.00</p>
+      <p id="stamp-theta">θ 45°</p>
+    </div>
+    <p class="dim-tag" id="dim-tag" hidden>2.12</p>
+  </div>
+  <section class="dock" aria-label="Dot product">
+    <p class="index-no">13</p>
+    <h1>Dot product</h1>
+    <p class="lede">Drag either tip. The dot product is a·b = |a||b|cos θ. The red measure is the shadow of a on the line of b.</p>
+    <p id="blurb">The angle is less than 90°. The dot product is positive. The shadow falls forward along b.</p>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch"></span><span>a</span><span id="a-out">3.00,  0.00</span></li>
+      <li><span class="swatch navy"></span><span>b</span><span id="b-out">2.00,  2.00</span></li>
+      <li><span class="swatch clay"></span><span>a·b</span><span id="dot-out">6.00</span></li>
+      <li><span class="swatch clay"></span><span>θ</span><span id="theta-out">45°</span></li>
+      <li><span class="swatch"></span><span>Shadow</span><span id="shadow-out">2.12</span></li>
+    </ul>
+    <p class="fine">The shadow length is a·b divided by the length of b. That shadow is a projection onto a line. <a href="09-projection.html">Lesson 09</a> projects a house onto a plane. A projection drops a direction, and the lost direction does not come back.</p>
+    <div class="row">
+      <button type="button" class="quiet" id="reset">Reset arrows</button>
+    </div>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>In physics and in mechanical engineering, work is force · displacement. Only the part of the force along the motion counts. A physicist or a mechanical engineer computes that product.</li>
+        <li>On a matte surface, brightness follows Lambert's cosine law. It is the dot product of the surface normal and the direction toward the light. A lighting artist and a graphics programmer use this.</li>
+        <li>Search and recommendation compare two lists of numbers by the cosine of the angle between them. That cosine is a dot product of two directions. A data scientist or a search engineer uses it to find similar items.</li>
+        <li>In a game, a triangle that faces away from the camera is often skipped. The sign of the face normal · the view direction tells which way the triangle points. A graphics programmer uses that test.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="12-eigenvectors.html">Eigenvectors</a> · <a href="../index.html">Lessons</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html">09 Projection</a>
+      <a href="10-perspective.html">10 Perspective</a>
+      <a href="11-inverse.html">11 Inverse</a>
+      <a href="12-eigenvectors.html">12 Eigenvectors</a>
+      <a href="13-dot-product.html" aria-current="page">13 Dot product</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="11-inverse.html" tabindex="-1" aria-hidden="true">11 Inverse</a>
+      <a class="reel-clone" href="12-eigenvectors.html" tabindex="-1" aria-hidden="true">12 Eigenvectors</a>
+      <a class="reel-clone" href="13-dot-product.html" tabindex="-1" aria-hidden="true">13 Dot product</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const blurb = document.getElementById('blurb');
+    const factors = document.getElementById('factors');
+    const dimTag = document.getElementById('dim-tag');
+    const narrowQuery = window.matchMedia('(max-width: 760px)');
+
+    const INK = 0x1a1f1a;
+    const PENCIL = 0x5c665c;
+    const SIGNAL = 0xd01212;
+    const PAPER = 0xe7efe4;
+    const HOME_A = new THREE.Vector2(3, 0);
+    const HOME_B = new THREE.Vector2(2, 2);
+
+    const a = HOME_A.clone();
+    const b = HOME_B.clone();
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function fmtDeg(deg) {
+      const nearest = Math.round(deg);
+      if (Math.abs(deg - nearest) < 0.06) return String(nearest);
+      return deg.toFixed(1);
+    }
+
+    function makeArrow() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0.07);
+      shape.lineTo(0.78, 0.07);
+      shape.lineTo(0.78, 0.18);
+      shape.lineTo(1, 0);
+      shape.lineTo(0.78, -0.18);
+      shape.lineTo(0.78, -0.07);
+      shape.lineTo(0, -0.07);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function makeHead() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0);
+      shape.lineTo(-0.22, 0.09);
+      shape.lineTo(-0.22, -0.09);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function makeBar() {
+      const geo = new THREE.PlaneGeometry(1, 1);
+      geo.translate(0.5, 0, 0);
+      return geo;
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+      const camera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 30);
+      camera.position.set(0, 0, 10);
+      camera.lookAt(0, 0, 0);
+
+      const grid = new THREE.GridHelper(10, 10, INK, 0xb7c0b4);
+      grid.rotation.x = Math.PI / 2;
+      grid.position.z = -0.08;
+      scene.add(grid);
+
+      const axis = new THREE.Line(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)),
+        new THREE.LineBasicMaterial({ color: 0xb7c0b4 })
+      );
+      axis.frustumCulled = false;
+      const arc = new THREE.Line(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(48 * 3), 3)),
+        new THREE.LineBasicMaterial({ color: INK })
+      );
+      arc.frustumCulled = false;
+      const ticks = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(24 * 6), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      ticks.frustumCulled = false;
+      const drop = new THREE.Line(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)),
+        new THREE.LineDashedMaterial({ color: PENCIL, dashSize: 0.14, gapSize: 0.08 })
+      );
+      drop.frustumCulled = false;
+      const extensions = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      extensions.frustumCulled = false;
+      const corner = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3)),
+        new THREE.LineBasicMaterial({ color: SIGNAL })
+      );
+      corner.frustumCulled = false;
+      scene.add(axis, arc, ticks, drop, extensions, corner);
+
+      const shadowBar = new THREE.Mesh(
+        makeBar(),
+        new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide })
+      );
+      shadowBar.matrixAutoUpdate = false;
+      const dimBar = new THREE.Mesh(
+        makeBar(),
+        new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide })
+      );
+      dimBar.matrixAutoUpdate = false;
+      scene.add(shadowBar, dimBar);
+
+      const arrowGeo = makeArrow();
+      const arrowA = new THREE.Mesh(arrowGeo, new THREE.MeshBasicMaterial({ color: INK, side: THREE.DoubleSide }));
+      const arrowB = new THREE.Mesh(arrowGeo, new THREE.MeshBasicMaterial({ color: PENCIL, side: THREE.DoubleSide }));
+      arrowA.matrixAutoUpdate = false;
+      arrowB.matrixAutoUpdate = false;
+      scene.add(arrowA, arrowB);
+
+      const headGeo = makeHead();
+      const headNear = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide }));
+      const headFar = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide }));
+      headNear.matrixAutoUpdate = false;
+      headFar.matrixAutoUpdate = false;
+      scene.add(headNear, headFar);
+
+      function makeHandle(color) {
+        const mesh = new THREE.Mesh(
+          new THREE.CircleGeometry(0.16, 22),
+          new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })
+        );
+        mesh.position.z = 0.14;
+        scene.add(mesh);
+        return mesh;
+      }
+      const handleA = makeHandle(INK);
+      const handleB = makeHandle(PENCIL);
+
+      const origin = new THREE.Mesh(
+        new THREE.CircleGeometry(0.055, 18),
+        new THREE.MeshBasicMaterial({ color: INK })
+      );
+      origin.position.z = 0.12;
+      scene.add(origin);
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const hitPoint = new THREE.Vector3();
+      let drag = null;
+
+      function arrowMatrix(mesh, x, y, z) {
+        const len = Math.hypot(x, y) || 0.001;
+        const ux = x / len;
+        const uy = y / len;
+        const thick = 0.9;
+        mesh.matrix.set(
+          ux * len, -uy * thick, 0, 0,
+          uy * len, ux * thick, 0, 0,
+          0, 0, 1, z,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function placeBar(mesh, from, to, width, z) {
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const len = Math.hypot(dx, dy);
+        if (len < 1e-4) {
+          mesh.visible = false;
+          return;
+        }
+        mesh.visible = true;
+        const ux = dx / len;
+        const uy = dy / len;
+        mesh.matrix.set(
+          ux * len, -uy * width, 0, from.x,
+          uy * len, ux * width, 0, from.y,
+          0, 0, 1, z,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function placeHead(mesh, at, dir) {
+        const len = dir.length();
+        if (len < 1e-4) {
+          mesh.visible = false;
+          return;
+        }
+        mesh.visible = true;
+        const ux = dir.x / len;
+        const uy = dir.y / len;
+        mesh.matrix.set(
+          ux, -uy, 0, at.x,
+          uy, ux, 0, at.y,
+          0, 0, 1, 0.08,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function writePair(line, points, z) {
+        const arr = line.geometry.getAttribute('position').array;
+        let o = 0;
+        points.forEach((p) => {
+          arr[o++] = p.x;
+          arr[o++] = p.y;
+          arr[o++] = z;
+        });
+        line.geometry.getAttribute('position').needsUpdate = true;
+        line.geometry.setDrawRange(0, points.length);
+        if (line.computeLineDistances) line.computeLineDistances();
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        const aspect = width / height;
+        const halfH = 4.6;
+        const halfW = halfH * aspect;
+        camera.left = -halfW;
+        camera.right = halfW;
+        camera.top = halfH;
+        camera.bottom = -halfH;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function clampTip(v) {
+        const len = v.length();
+        if (len < 0.55) v.setLength(0.55);
+        else if (len > 3.7) v.setLength(3.7);
+      }
+
+      function placeTag(point) {
+        const v = new THREE.Vector3(point.x, point.y, 0).project(camera);
+        const x = (v.x * 0.5 + 0.5) * stage.clientWidth;
+        const y = (-v.y * 0.5 + 0.5) * stage.clientHeight;
+        dimTag.hidden = false;
+        dimTag.style.left = x + 'px';
+        dimTag.style.top = y + 'px';
+      }
+
+      function sync() {
+        frame();
+        const la = a.length();
+        const lb = b.length();
+        const dot = a.x * b.x + a.y * b.y;
+        const cos = THREE.MathUtils.clamp(dot / (la * lb), -1, 1);
+        const theta = Math.acos(cos);
+        const thetaDeg = theta * 180 / Math.PI;
+        const shadow = dot / lb;
+        const right = Math.abs(thetaDeg - 90) < 2.2;
+        const ubx = b.x / lb;
+        const uby = b.y / lb;
+        const foot = new THREE.Vector2(ubx * shadow, uby * shadow);
+        let nx = -uby;
+        let ny = ubx;
+        const side = a.x * nx + a.y * ny;
+        if (side > 0) {
+          nx = -nx;
+          ny = -ny;
+        }
+        const off = 0.62;
+        const dim0 = new THREE.Vector2(nx * off, ny * off);
+        const dim1 = new THREE.Vector2(foot.x + nx * off, foot.y + ny * off);
+        const showDim = Math.abs(shadow) > 0.12;
+
+        writePair(axis, [
+          new THREE.Vector2(-ubx * 4.3, -uby * 4.3),
+          new THREE.Vector2(ubx * 4.3, uby * 4.3)
+        ], 0);
+        writePair(drop, [a, foot], 0.02);
+
+        placeBar(shadowBar, new THREE.Vector2(0, 0), foot, 0.055, 0.03);
+        if (showDim) {
+          placeBar(dimBar, dim0, dim1, 0.035, 0.05);
+          const along = new THREE.Vector2(ubx, uby);
+          if (shadow < 0) along.negate();
+          placeHead(headFar, dim1, along);
+          placeHead(headNear, dim0, along.clone().negate());
+          writePair(extensions, [new THREE.Vector2(0, 0), dim0, foot, dim1], 0.02);
+          extensions.visible = true;
+          dimTag.textContent = fmt(shadow);
+          const mid = dim0.clone().add(dim1).multiplyScalar(0.5);
+          mid.x += nx * 0.28;
+          mid.y += ny * 0.28;
+          placeTag(mid);
+        } else {
+          dimBar.visible = false;
+          headNear.visible = false;
+          headFar.visible = false;
+          extensions.visible = false;
+          dimTag.hidden = true;
+        }
+
+        const angA = Math.atan2(a.y, a.x);
+        let delta = Math.atan2(b.y, b.x) - angA;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        const radius = Math.min(1.15, Math.min(la, lb) * 0.62);
+        const arcCount = 40;
+        const arcArr = arc.geometry.getAttribute('position').array;
+        for (let i = 0; i < arcCount; i += 1) {
+          const t = angA + delta * (i / (arcCount - 1));
+          arcArr[i * 3] = Math.cos(t) * radius;
+          arcArr[i * 3 + 1] = Math.sin(t) * radius;
+          arcArr[i * 3 + 2] = 0.04;
+        }
+        arc.geometry.getAttribute('position').needsUpdate = true;
+        arc.geometry.setDrawRange(0, Math.abs(delta) < 0.04 ? 0 : arcCount);
+        arc.material.color.setHex(right ? SIGNAL : INK);
+
+        const tickArr = ticks.geometry.getAttribute('position').array;
+        tickArr.fill(0);
+        let tickPairs = 0;
+        const step = 15 * Math.PI / 180;
+        const sweep = Math.abs(delta);
+        const sign = Math.sign(delta) || 1;
+        for (let mark = step; mark < sweep - 0.04 && tickPairs < 24; mark += step) {
+          const t = angA + sign * mark;
+          const inner = radius - 0.12;
+          const outer = radius + 0.05;
+          const o = tickPairs * 6;
+          tickArr[o] = Math.cos(t) * inner;
+          tickArr[o + 1] = Math.sin(t) * inner;
+          tickArr[o + 2] = 0.04;
+          tickArr[o + 3] = Math.cos(t) * outer;
+          tickArr[o + 4] = Math.sin(t) * outer;
+          tickArr[o + 5] = 0.04;
+          tickPairs += 1;
+        }
+        ticks.geometry.getAttribute('position').needsUpdate = true;
+        ticks.geometry.setDrawRange(0, tickPairs * 2);
+        ticks.visible = !right && tickPairs > 0;
+
+        if (right) {
+          const mark = 0.46;
+          const ax = a.x / la;
+          const ay = a.y / la;
+          const p1 = new THREE.Vector2(ax * mark, ay * mark);
+          const p3 = new THREE.Vector2(ubx * mark, uby * mark);
+          const p2 = new THREE.Vector2(p1.x + p3.x, p1.y + p3.y);
+          writePair(corner, [p1, p2, p2, p3], 0.06);
+          corner.visible = true;
+        } else {
+          corner.visible = false;
+        }
+
+        arrowMatrix(arrowA, a.x, a.y, 0.07);
+        arrowMatrix(arrowB, b.x, b.y, 0.07);
+        handleA.position.set(a.x, a.y, 0.16);
+        handleB.position.set(b.x, b.y, 0.16);
+
+        const dotStamp = document.getElementById('stamp-dot');
+        dotStamp.textContent = 'a·b ' + fmt(dot);
+        dotStamp.classList.toggle('is-zero', right);
+        document.getElementById('stamp-theta').textContent = 'θ ' + fmtDeg(thetaDeg) + '°';
+        document.getElementById('a-out').textContent = fmt(a.x) + ',  ' + fmt(a.y);
+        document.getElementById('b-out').textContent = fmt(b.x) + ',  ' + fmt(b.y);
+        document.getElementById('dot-out').textContent = fmt(dot);
+        document.getElementById('theta-out').textContent = fmtDeg(thetaDeg) + '°';
+        document.getElementById('shadow-out').textContent = fmt(shadow);
+        factors.textContent =
+          'a·b = |a| |b| cos θ\n' +
+          'a·b      ' + fmt(dot) + '\n' +
+          '|a|      ' + fmt(la) + '\n' +
+          '|b|      ' + fmt(lb) + '\n' +
+          'cos θ    ' + fmt(cos) + '\n' +
+          'θ        ' + fmtDeg(thetaDeg) + '°\n' +
+          'shadow   ' + fmt(shadow);
+
+        if (right) {
+          blurb.textContent = 'The arrows are perpendicular. The dot product is zero. The shadow has no length.';
+        } else if (dot > 0) {
+          blurb.textContent = 'The angle is less than 90°. The dot product is positive. The shadow falls forward along b.';
+        } else {
+          blurb.textContent = 'The angle is more than 90°. The dot product is negative. The shadow falls backward, opposite b.';
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      function worldAt(event) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        if (!raycaster.ray.intersectPlane(plane, hitPoint)) return null;
+        return hitPoint;
+      }
+
+      function pickHandle(event) {
+        const point = worldAt(event);
+        if (!point) return null;
+        const reach = narrowQuery.matches ? 0.62 : 0.48;
+        const da = Math.hypot(point.x - a.x, point.y - a.y);
+        const db = Math.hypot(point.x - b.x, point.y - b.y);
+        if (da <= db && da < reach) return a;
+        if (db < reach) return b;
+        return null;
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        const target = pickHandle(event);
+        if (!target) return;
+        drag = target;
+        canvas.setPointerCapture(event.pointerId);
+        canvas.style.cursor = 'grabbing';
+      });
+      canvas.addEventListener('pointermove', (event) => {
+        const point = worldAt(event);
+        if (!point) return;
+        if (!drag) {
+          canvas.style.cursor = pickHandle(event) ? 'grab' : 'default';
+          return;
+        }
+        drag.set(point.x, point.y);
+        clampTip(drag);
+        sync();
+      });
+      function endDrag() {
+        drag = null;
+        canvas.style.cursor = 'default';
+      }
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+      document.getElementById('reset').addEventListener('click', () => {
+        a.copy(HOME_A);
+        b.copy(HOME_B);
+        sync();
+      });
+
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>
