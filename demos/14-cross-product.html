@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cross product — Seen Geometry</title>
+  <meta name="description" content="Two arrows in the plane. The red arrow is their cross product. Its length is the area of the parallelogram they span.">
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">14 · Cross product</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="Two arrows on graph paper. The red arrow is their cross product and stands perpendicular to both. A shaded parallelogram shows the area."></canvas>
+    <div class="stamps">
+      <p id="stamp-hand">Thumb up</p>
+      <p data-kind="point" id="stamp-cross">a×b 6.00</p>
+      <p id="stamp-area">Area 6.00</p>
+    </div>
+    <p class="dim-tag" id="dim-tag">6.00</p>
+  </div>
+  <section class="dock" aria-label="Cross product">
+    <p class="index-no">14</p>
+    <h1>Cross product</h1>
+    <p class="lede">Drag either tip, or set the angle. The red arrow is a × b. It stands perpendicular to both arrows, and its length is the area of the shaded parallelogram. Press Swap a and b and the arrow flips.</p>
+    <p id="blurb">Curl the fingers of your right hand from a toward b. Your thumb points the same way as the red arrow. The arrow stands up, out of the page.</p>
+    <label class="field">
+      <span>Angle from a to b <output id="angle-out">90°</output></span>
+      <input id="angle" type="range" min="-180" max="180" step="1" value="90" aria-label="Angle from a to b">
+    </label>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch"></span><span>a</span><span id="a-out">3.00,  0.00,  0.00</span></li>
+      <li><span class="swatch navy"></span><span>b</span><span id="b-out">0.00,  2.00,  0.00</span></li>
+      <li><span class="swatch clay"></span><span>a × b</span><span id="cross-out">0.00,  0.00,  6.00</span></li>
+      <li><span class="swatch"></span><span>θ</span><span id="theta-out">90°</span></li>
+      <li><span class="swatch clay"></span><span>Area</span><span id="area-out">6.00</span></li>
+    </ul>
+    <p class="fine">The <a href="13-dot-product.html">dot product</a> uses cosine and the shadow of one arrow on the other. The cross product uses sine and the area of the parallelogram. In two dimensions, that signed area is the <a href="06-determinant.html">determinant</a>.</p>
+    <div class="row">
+      <button type="button" class="quiet" id="swap">Swap a and b</button>
+      <button type="button" class="quiet" id="reset">Reset arrows</button>
+    </div>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>In 3D graphics and in game development, the normal of a polygon is the cross product of two of its edges. A graphics programmer or a game developer uses that normal for lighting, because the brightness depends on how the normal lines up with the light.</li>
+        <li>In mechanical engineering and in physics, torque is r × F. The lever arm r runs from the pivot to the force, and F is the force. A mechanical engineer or a physicist reads the direction of the torque with the right-hand rule.</li>
+        <li>In electrical engineering, the Lorentz force on a moving charge is q (v × B). v is the velocity of the charge and B is the magnetic field. An electrical engineer uses this cross product.</li>
+        <li>In CAD and in GIS, the cross product of two edges of a polygon gives its area, and the sign gives the winding order, clockwise or counterclockwise. A CAD specialist or a GIS analyst uses that sign so every face has a consistent front.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="13-dot-product.html">Dot product</a> · <a href="../index.html">Lessons</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html">09 Projection</a>
+      <a href="10-perspective.html">10 Perspective</a>
+      <a href="11-inverse.html">11 Inverse</a>
+      <a href="12-eigenvectors.html">12 Eigenvectors</a>
+      <a href="13-dot-product.html">13 Dot product</a>
+      <a href="14-cross-product.html" aria-current="page">14 Cross product</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="11-inverse.html" tabindex="-1" aria-hidden="true">11 Inverse</a>
+      <a class="reel-clone" href="12-eigenvectors.html" tabindex="-1" aria-hidden="true">12 Eigenvectors</a>
+      <a class="reel-clone" href="13-dot-product.html" tabindex="-1" aria-hidden="true">13 Dot product</a>
+      <a class="reel-clone" href="14-cross-product.html" tabindex="-1" aria-hidden="true">14 Cross product</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const narrowQuery = window.matchMedia('(max-width: 760px)');
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const blurb = document.getElementById('blurb');
+    const factors = document.getElementById('factors');
+    const dimTag = document.getElementById('dim-tag');
+    const angleInput = document.getElementById('angle');
+    const angleOut = document.getElementById('angle-out');
+
+    const INK = 0x1a1f1a;
+    const PENCIL = 0x5c665c;
+    const SIGNAL = 0xd01212;
+    const PAPER = 0xe7efe4;
+    const HOME_A = new THREE.Vector3(3, 0, 0);
+    const HOME_B = new THREE.Vector3(0, 2, 0);
+    const HOME_POS = new THREE.Vector3(7.6, 5.4, 8.8);
+    const HOME_TARGET = new THREE.Vector3(0.4, 1.85, -0.45);
+
+    const a = HOME_A.clone();
+    const b = HOME_B.clone();
+    const UP = new THREE.Vector3(0, 1, 0);
+    const _from = new THREE.Vector3();
+    const _to = new THREE.Vector3();
+    const _dir = new THREE.Vector3();
+    const _tmp = new THREE.Vector3();
+
+    let sliding = false;
+    let showTag = false;
+    const tagPoint = new THREE.Vector3();
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function fmtDeg(deg) {
+      const nearest = Math.round(deg);
+      if (Math.abs(deg - nearest) < 0.06) return String(nearest);
+      return deg.toFixed(1);
+    }
+
+    function triple(x, y, z) {
+      return fmt(x) + ',  ' + fmt(y) + ',  ' + fmt(z);
+    }
+
+    function line(label, value) {
+      return label.padEnd(9, ' ') + value;
+    }
+
+    function mathToThree(x, y, z, target) {
+      target.set(x, z, -y);
+      return target;
+    }
+
+    function clampTip(v) {
+      v.z = 0;
+      const len = Math.hypot(v.x, v.y);
+      if (len < 1e-6) {
+        v.set(0.55, 0, 0);
+        return;
+      }
+      if (len < 0.55) v.multiplyScalar(0.55 / len);
+      else if (len > 3.6) v.multiplyScalar(3.6 / len);
+      v.z = 0;
+    }
+
+    function makeShaft(radius, color) {
+      const geometry = new THREE.CylinderGeometry(radius, radius, 1, 16);
+      geometry.translate(0, 0.5, 0);
+      const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color }));
+      mesh.frustumCulled = false;
+      return mesh;
+    }
+
+    function makeHead(radius, height, color) {
+      const geometry = new THREE.ConeGeometry(radius, height, 16);
+      geometry.translate(0, height / 2, 0);
+      const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color }));
+      mesh.userData.headLen = height;
+      mesh.frustumCulled = false;
+      return mesh;
+    }
+
+    function placeArrow(shaft, head, x, y, z, headMax) {
+      const len = Math.hypot(x, y, z);
+      if (len < 0.06) {
+        shaft.visible = false;
+        head.visible = false;
+        return;
+      }
+      shaft.visible = true;
+      head.visible = true;
+      mathToThree(x, y, z, _tmp);
+      _dir.copy(_tmp).multiplyScalar(1 / len);
+      const turn = new THREE.Quaternion().setFromUnitVectors(UP, _dir);
+      const headLen = Math.min(headMax, Math.max(0.18, len * 0.24));
+      const shaftLen = Math.max(len - headLen, 0.02);
+      shaft.scale.set(1, shaftLen, 1);
+      shaft.quaternion.copy(turn);
+      shaft.position.set(0, 0, 0);
+      const built = head.userData.headLen;
+      const s = headLen / built;
+      head.scale.set(s, s, s);
+      head.quaternion.copy(turn);
+      head.position.copy(_dir).multiplyScalar(shaftLen);
+    }
+
+    function placeHead(mesh, tx, ty, tz, dx, dy, dz, len) {
+      const mag = Math.hypot(dx, dy, dz);
+      if (mag < 1e-6) {
+        mesh.visible = false;
+        return;
+      }
+      mathToThree(dx / mag, dy / mag, dz / mag, _dir);
+      mesh.quaternion.setFromUnitVectors(UP, _dir);
+      const s = len / mesh.userData.headLen;
+      mesh.scale.set(s, s, s);
+      mathToThree(tx, ty, tz, _tmp);
+      mesh.position.copy(_tmp).addScaledVector(_dir, -len);
+      mesh.visible = true;
+    }
+
+    function placeBetween(mesh, x0, y0, z0, x1, y1, z1) {
+      mathToThree(x0, y0, z0, _from);
+      mathToThree(x1, y1, z1, _to);
+      _dir.subVectors(_to, _from);
+      const len = _dir.length();
+      if (len < 0.04) {
+        mesh.visible = false;
+        return;
+      }
+      _dir.multiplyScalar(1 / len);
+      mesh.visible = true;
+      mesh.quaternion.setFromUnitVectors(UP, _dir);
+      mesh.scale.set(1, len, 1);
+      mesh.position.copy(_from);
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+      const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 80);
+      camera.position.copy(HOME_POS);
+
+      const grid = new THREE.GridHelper(12, 12, INK, 0xb7c0b4);
+      grid.position.y = -0.03;
+      scene.add(grid);
+
+      const fill = new THREE.Mesh(
+        new THREE.BufferGeometry(),
+        new THREE.MeshBasicMaterial({
+          color: INK,
+          transparent: true,
+          opacity: 0.28,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        })
+      );
+      fill.geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(18), 3));
+      fill.frustumCulled = false;
+      fill.renderOrder = 1;
+
+      const edges = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(24), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      edges.frustumCulled = false;
+      edges.renderOrder = 2;
+
+      const arc = new THREE.Line(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(42 * 3), 3)),
+        new THREE.LineBasicMaterial({ color: INK })
+      );
+      arc.frustumCulled = false;
+
+      const fingers = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(18), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      fingers.frustumCulled = false;
+
+      const extensions = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      extensions.frustumCulled = false;
+      scene.add(fill, edges, arc, fingers, extensions);
+
+      const shaftA = makeShaft(0.05, INK);
+      const headA = makeHead(0.15, 0.4, INK);
+      const shaftB = makeShaft(0.05, PENCIL);
+      const headB = makeHead(0.15, 0.4, PENCIL);
+      const shaftC = makeShaft(0.07, SIGNAL);
+      const headC = makeHead(0.2, 0.62, SIGNAL);
+      const dimShaft = makeShaft(0.028, SIGNAL);
+      const dimLow = makeHead(0.09, 0.28, SIGNAL);
+      const dimHigh = makeHead(0.09, 0.28, SIGNAL);
+      const curlHead = makeHead(0.075, 0.24, INK);
+      scene.add(shaftA, headA, shaftB, headB, shaftC, headC, dimShaft, dimLow, dimHigh, curlHead);
+
+      function makeHandle(color) {
+        const mesh = new THREE.Mesh(
+          new THREE.SphereGeometry(0.12, 18, 12),
+          new THREE.MeshBasicMaterial({ color })
+        );
+        mesh.renderOrder = 5;
+        scene.add(mesh);
+        return mesh;
+      }
+      const handleA = makeHandle(INK);
+      const handleB = makeHandle(PENCIL);
+      const origin = new THREE.Mesh(
+        new THREE.SphereGeometry(0.07, 16, 12),
+        new THREE.MeshBasicMaterial({ color: INK })
+      );
+      scene.add(origin);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = !reduceMotion;
+      controls.dampingFactor = 0.08;
+      controls.target.copy(HOME_TARGET);
+      controls.minDistance = 5;
+      controls.maxDistance = 26;
+      controls.minPolarAngle = 0.18;
+      controls.maxPolarAngle = Math.PI * 0.56;
+      controls.update();
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const hitPoint = new THREE.Vector3();
+      let drag = null;
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function put(arr, index, x, y, z, lift) {
+        const o = index * 3;
+        arr[o] = x;
+        arr[o + 1] = z + lift;
+        arr[o + 2] = -y;
+      }
+
+      function render() {
+        if (showTag) {
+          _tmp.copy(tagPoint);
+          camera.updateMatrixWorld();
+          const v = _tmp.project(camera);
+          const pad = 16;
+          const x = Math.min(stage.clientWidth - pad, Math.max(pad, (v.x * 0.5 + 0.5) * stage.clientWidth));
+          const y = Math.min(stage.clientHeight - pad, Math.max(pad, (-v.y * 0.5 + 0.5) * stage.clientHeight));
+          dimTag.hidden = v.z > 1;
+          dimTag.style.left = x + 'px';
+          dimTag.style.top = y + 'px';
+        } else {
+          dimTag.hidden = true;
+        }
+        renderer.render(scene, camera);
+      }
+
+      function sync() {
+        frame();
+        const la = Math.hypot(a.x, a.y);
+        const lb = Math.hypot(b.x, b.y);
+        const dot = a.x * b.x + a.y * b.y;
+        const cx = 0;
+        const cy = 0;
+        const cz = a.x * b.y - a.y * b.x;
+        const area = Math.abs(cz);
+        const cos = THREE.MathUtils.clamp(dot / (la * lb), -1, 1);
+        const theta = Math.acos(cos);
+        const thetaDeg = theta * 180 / Math.PI;
+        const signed = Math.atan2(cz, dot);
+        const signedDeg = signed * 180 / Math.PI;
+        const flat = area < 0.08;
+        const sinTheta = area / (la * lb);
+
+        placeArrow(shaftA, headA, a.x, a.y, 0, 0.4);
+        placeArrow(shaftB, headB, b.x, b.y, 0, 0.4);
+        placeArrow(shaftC, headC, cx, cy, cz, 0.62);
+        mathToThree(a.x, a.y, 0.08, handleA.position);
+        mathToThree(b.x, b.y, 0.08, handleB.position);
+        origin.position.set(0, 0.08, 0);
+
+        const fillArr = fill.geometry.getAttribute('position').array;
+        const ax = a.x;
+        const ay = a.y;
+        const bx = b.x;
+        const by = b.y;
+        put(fillArr, 0, 0, 0, 0, 0.03);
+        put(fillArr, 1, ax, ay, 0, 0.03);
+        put(fillArr, 2, ax + bx, ay + by, 0, 0.03);
+        put(fillArr, 3, 0, 0, 0, 0.03);
+        put(fillArr, 4, ax + bx, ay + by, 0, 0.03);
+        put(fillArr, 5, bx, by, 0, 0.03);
+        fill.geometry.getAttribute('position').needsUpdate = true;
+        fill.visible = !flat;
+
+        const edgeArr = edges.geometry.getAttribute('position').array;
+        const corners = [[0, 0], [ax, ay], [ax + bx, ay + by], [bx, by]];
+        for (let i = 0; i < 4; i += 1) {
+          const p = corners[i];
+          const q = corners[(i + 1) % 4];
+          put(edgeArr, i * 2, p[0], p[1], 0, 0.045);
+          put(edgeArr, i * 2 + 1, q[0], q[1], 0, 0.045);
+        }
+        edges.geometry.getAttribute('position').needsUpdate = true;
+        edges.visible = !flat;
+
+        const angA = Math.atan2(a.y, a.x);
+        const radius = Math.min(0.98, Math.min(la, lb) * 0.5);
+        const arcArr = arc.geometry.getAttribute('position').array;
+        const arcCount = 40;
+        if (flat) {
+          arc.geometry.setDrawRange(0, 0);
+          curlHead.visible = false;
+          fingers.visible = false;
+        } else {
+          for (let i = 0; i < arcCount; i += 1) {
+            const t = angA + signed * (i / (arcCount - 1)) * 0.9;
+            put(arcArr, i, Math.cos(t) * radius, Math.sin(t) * radius, 0, 0.06);
+          }
+          arc.geometry.getAttribute('position').needsUpdate = true;
+          arc.geometry.setDrawRange(0, arcCount);
+          const tEnd = angA + signed;
+          const tangent = Math.sign(signed) || 1;
+          placeHead(
+            curlHead,
+            Math.cos(tEnd) * radius,
+            Math.sin(tEnd) * radius,
+            0.06,
+            -Math.sin(tEnd) * tangent,
+            Math.cos(tEnd) * tangent,
+            0,
+            0.24
+          );
+          const fingerArr = fingers.geometry.getAttribute('position').array;
+          for (let k = 0; k < 3; k += 1) {
+            const t = angA + signed * (0.28 + k * 0.16);
+            put(fingerArr, k * 2, Math.cos(t) * (radius - 0.02), Math.sin(t) * (radius - 0.02), 0, 0.06);
+            put(fingerArr, k * 2 + 1, Math.cos(t) * (radius + 0.16), Math.sin(t) * (radius + 0.16), 0, 0.06);
+          }
+          fingers.geometry.getAttribute('position').needsUpdate = true;
+          fingers.visible = Math.abs(signed) > 0.35;
+        }
+
+        const midX = (ax + bx) * 0.5;
+        const side = midX >= 0 ? -1 : 1;
+        const off = 1.05 * side;
+        const headGap = 0.26;
+        if (flat) {
+          dimShaft.visible = false;
+          dimLow.visible = false;
+          dimHigh.visible = false;
+          extensions.visible = false;
+          showTag = false;
+        } else {
+          const sign = Math.sign(cz) || 1;
+          placeBetween(dimShaft, off, 0, sign * headGap, off, 0, cz - sign * headGap);
+          placeHead(dimLow, off, 0, 0, 0, 0, -sign, headGap);
+          placeHead(dimHigh, off, 0, cz, 0, 0, sign, headGap);
+          const ext = extensions.geometry.getAttribute('position').array;
+          put(ext, 0, 0, 0, 0, 0.05);
+          put(ext, 1, off, 0, 0, 0.05);
+          put(ext, 2, 0, 0, cz, 0);
+          put(ext, 3, off, 0, cz, 0);
+          extensions.geometry.getAttribute('position').needsUpdate = true;
+          extensions.visible = true;
+          showTag = true;
+          dimTag.textContent = fmt(area);
+          mathToThree(off * 1.42, 0, cz * 0.5, tagPoint);
+        }
+
+        const stampCross = document.getElementById('stamp-cross');
+        stampCross.textContent = 'a×b ' + fmt(cz);
+        stampCross.classList.toggle('is-zero', flat);
+        document.getElementById('stamp-area').textContent = 'Area ' + fmt(area);
+        const hand = document.getElementById('stamp-hand');
+        if (flat) hand.textContent = 'Lined up';
+        else if (cz > 0) hand.textContent = 'Thumb up';
+        else hand.textContent = 'Thumb down';
+
+        document.getElementById('a-out').textContent = triple(a.x, a.y, 0);
+        document.getElementById('b-out').textContent = triple(b.x, b.y, 0);
+        document.getElementById('cross-out').textContent = triple(cx, cy, cz);
+        document.getElementById('theta-out').textContent = fmtDeg(thetaDeg) + '°';
+        document.getElementById('area-out').textContent = fmt(area);
+        if (!sliding) angleInput.value = String(Math.round(signedDeg));
+        angleOut.textContent = fmtDeg(signedDeg) + '°';
+        factors.textContent = [
+          'a × b = |a| |b| sin θ',
+          line('a × b', triple(cx, cy, cz)),
+          line('|a|', fmt(la)),
+          line('|b|', fmt(lb)),
+          line('sin θ', fmt(sinTheta)),
+          line('θ', fmtDeg(thetaDeg) + '°'),
+          line('area', fmt(area))
+        ].join('\n');
+
+        if (flat) {
+          blurb.textContent = 'The arrows lie on one line. The parallelogram has closed up, so the area is zero. The cross product is zero.';
+        } else if (cz > 0) {
+          blurb.textContent = 'Curl the fingers of your right hand from a toward b. Your thumb points the same way as the red arrow. The arrow stands up, out of the page.';
+        } else {
+          blurb.textContent = 'Curl the fingers of your right hand from a toward b. Your thumb points the same way as the red arrow. The arrow stands down, into the page. Swapping the order of a and b flips the arrow.';
+        }
+
+        render();
+      }
+
+      function worldMath(event) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        if (!raycaster.ray.intersectPlane(plane, hitPoint)) return null;
+        return { x: hitPoint.x, y: -hitPoint.z };
+      }
+
+      function pickHandle(event) {
+        const point = worldMath(event);
+        if (!point) return null;
+        const reach = narrowQuery.matches ? 1.15 : 0.72;
+        const da = Math.hypot(point.x - a.x, point.y - a.y);
+        const db = Math.hypot(point.x - b.x, point.y - b.y);
+        if (da <= db && da < reach) return a;
+        if (db < reach) return b;
+        return null;
+      }
+
+      function applyAngle(deg) {
+        const lb = Math.max(Math.hypot(b.x, b.y), 0.55);
+        const aAng = Math.atan2(a.y, a.x);
+        const t = aAng + deg * Math.PI / 180;
+        b.set(Math.cos(t) * lb, Math.sin(t) * lb, 0);
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        const target = pickHandle(event);
+        if (!target) return;
+        drag = target;
+        controls.enabled = false;
+        event.stopPropagation();
+        event.preventDefault();
+        canvas.setPointerCapture(event.pointerId);
+        canvas.style.cursor = 'grabbing';
+      }, true);
+      canvas.addEventListener('pointermove', (event) => {
+        const point = worldMath(event);
+        if (!point) return;
+        if (!drag) {
+          canvas.style.cursor = pickHandle(event) ? 'grab' : 'crosshair';
+          return;
+        }
+        drag.set(point.x, point.y, 0);
+        clampTip(drag);
+        sync();
+      });
+      function endDrag() {
+        if (!drag) return;
+        drag = null;
+        controls.enabled = true;
+        canvas.style.cursor = 'crosshair';
+      }
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+
+      angleInput.addEventListener('input', () => {
+        sliding = true;
+        applyAngle(Number(angleInput.value));
+        sync();
+        sliding = false;
+      });
+      document.getElementById('swap').addEventListener('click', () => {
+        const hold = a.clone();
+        a.copy(b);
+        b.copy(hold);
+        sync();
+      });
+      document.getElementById('reset').addEventListener('click', () => {
+        a.copy(HOME_A);
+        b.copy(HOME_B);
+        camera.position.copy(HOME_POS);
+        controls.target.copy(HOME_TARGET);
+        controls.update();
+        sync();
+      });
+
+      controls.addEventListener('change', render);
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+
+      if (!reduceMotion) {
+        function loop() {
+          requestAnimationFrame(loop);
+          controls.update();
+          render();
+        }
+        loop();
+      }
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>
