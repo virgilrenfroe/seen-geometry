@@ -68,6 +68,20 @@
         <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>A surface normal is a direction. It tells a light which way a face points. Moving the object does not change that direction. Lighting in games and films depends on this.</li>
+        <li>In a physics simulation, a position is a point and a velocity is a direction. A shift of the world moves the point. It does not add to the velocity.</li>
+        <li>On a map, a location is a point and a compass heading is a direction.</li>
+        <li>Graphics hardware stores a point and a direction in the same kind of vector. The extra number, w, marks which one it is.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
     <p class="next"><a href="03-compose-transforms.html">Order of transforms</a> · <a href="05-shear.html">Next: shear</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

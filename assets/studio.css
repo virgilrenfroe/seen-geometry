@@ -176,6 +176,14 @@ h1, h2, .formula {
   overflow-wrap: break-word;
 }
 .bom p { margin: 4px 0 0; line-height: 1.3; font-size: 0.98rem; }
+.bom .where {
+  margin-top: 3px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--signal);
+}
 .bom a:hover .balloon,
 .bom a:focus-visible .balloon {
   background: var(--signal);
@@ -386,6 +394,28 @@ input[type="number"] {
 .matrix td { padding: 0.16rem 0.4rem; text-align: right; }
 .matrix td:last-child { color: var(--signal); font-weight: 700; }
 .fine { color: var(--mute); font-size: 0.95rem; }
+.used {
+  margin: 0.85rem 0 0.15rem;
+  padding: 0.15rem 0 0.1rem 0.7rem;
+  border-left: 2px solid var(--signal);
+}
+.used summary {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--signal);
+  cursor: pointer;
+}
+.used summary::-webkit-details-marker { display: none; }
+.used summary::marker { content: ""; }
+.used summary::before {
+  content: "Note  ";
+  color: var(--ink);
+}
+.used ul { margin: 0.4rem 0 0; padding: 0 0 0 1.05rem; }
+.used li { margin: 0.32rem 0; font-size: 0.95rem; line-height: 1.35; }
+.used li::marker { color: var(--signal); }
 .next { margin-top: 0.9rem; }
 .next a, .block a { text-underline-offset: 0.16em; }
 

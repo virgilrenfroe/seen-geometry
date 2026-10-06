@@ -57,7 +57,22 @@
         <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
-    <p class="fine">Color shows height. Color is not in the matrix. Taller blocks are warmer.</p>
+    <p class="fine">Color shows height. Color is not in the matrix. Taller blocks are darker.</p>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>A game or a film draws many trees, blades of grass, or people from one model. A particle effect often draws many copies of one small shape. An environment artist and a technical artist set this up.</li>
+        <li>A city model or a digital twin repeats buildings and street lights. A GIS developer or a digital-twin developer builds that view.</li>
+        <li>An architecture model can repeat every seat in a stadium. A CAD viewer repeats bolts and panels from one part.</li>
+        <li>A science viewer can draw many atoms as copies of one sphere. A scientific visualization developer builds that picture.</li>
+        <li>One draw call keeps the picture steady on a phone, a laptop, or a VR headset. A VR headset needs a high frame rate so the view stays comfortable.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
     <p class="next"><a href="02-morph-targets.html">Next: morph targets</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

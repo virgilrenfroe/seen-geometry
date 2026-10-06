@@ -47,6 +47,20 @@
       <button type="button" class="quiet" id="base">Base only</button>
       <button type="button" class="quiet" id="reset">Reset view</button>
     </div>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>Character artists and riggers build face shapes on one mesh. Animators blend those shapes for a smile or for speech. This is how many films and games move a face.</li>
+        <li>The points stay on the same model. They do not jump to a new mesh.</li>
+        <li>A product page can blend two shapes of one object, so a viewer watches the form change.</li>
+        <li>In medicine, a related method blends two shapes of the same bone or organ to show a change.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
     <p class="next"><a href="01-instanced-field.html">Instanced field</a> · <a href="03-compose-transforms.html">Next: order of transforms</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

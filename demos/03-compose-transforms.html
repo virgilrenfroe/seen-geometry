@@ -69,6 +69,20 @@
         <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>A robotics engineer places a robot hand by combining the moves of each joint. The order of those moves changes where the hand goes. This is called forward kinematics.</li>
+        <li>A character rigger stacks bones. Each bone moves in the frame of the bone above it.</li>
+        <li>A 3D tool stores a scene as a tree. A move on a parent carries every child.</li>
+        <li>A mechanical designer places parts in an assembly. A turn and then a slide is not the same as a slide and then a turn.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
     <p class="next"><a href="02-morph-targets.html">Morph targets</a> · <a href="04-point-vs-direction.html">Next: point vs direction</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

@@ -20,6 +20,8 @@ An educator directed AI agents to build these pages. The author is not a softwar
 | [07 Fold](demos/07-fold.html) | Drag a crease. One half folds over the line. The reflection has determinant −1, so the mark flips. An offset line is a slide, a reflection, and a slide back. |
 | [08 Rotation](demos/08-rotation.html) | Drag a point on the unit circle. The rotation matrix has determinant 1. Two folds make that turn: twice the angle between the creases. |
 
+Each lesson has a short note, “Where this is used.” It names fields and jobs where the idea appears.
+
 On a wide screen, demo 03 can show all three orders at once. The tail positions are listed either way. Demo 04 can show the point and the direction side by side.
 
 A useful order for a class:
