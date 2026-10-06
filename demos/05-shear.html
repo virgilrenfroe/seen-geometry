@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shear — Seen Geometry</title>
   <meta name="description" content="A shear of the unit square. The area stays 1. The corner angle changes.">
-  <meta name="theme-color" content="#f3eee6">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,7 +48,7 @@
       <li><span class="swatch clay"></span><span>Area</span><span id="area-out">1.00</span></li>
       <li><span class="swatch"></span><span>Angle</span><span id="angle-out">—</span></li>
     </ul>
-    <p class="fine">The signal square is the unit square. Its area is the absolute value of the determinant. For this shear, that value stays 1.</p>
+    <p class="fine">The red square is the unit square. Its area is the absolute value of the determinant. For this shear, that value stays 1.</p>
     <table class="matrix" id="matrix">
       <caption>2×2 shear. Read each row from left to right.</caption>
       <tbody>
@@ -137,7 +137,7 @@
       renderer.toneMapping = THREE.NoToneMapping;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf3eee6);
+      scene.background = new THREE.Color(0xe7efe4);
       const camera = new THREE.OrthographicCamera(-4, 4, 3, -3, 0.1, 40);
       camera.position.set(0.5, 0.5, 12);
 
@@ -156,7 +156,7 @@
           const mesh = new THREE.Mesh(
             cellGeometry(x, y),
             new THREE.MeshBasicMaterial({
-              color: unit ? 0xff3d1a : 0xe6ddd2,
+              color: unit ? 0xd01212 : 0xd0d8cc,
               side: THREE.DoubleSide
             })
           );

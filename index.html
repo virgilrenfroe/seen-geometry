@@ -5,126 +5,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Seen Geometry</title>
   <meta name="description" content="Eight pictures for a first course in coordinate geometry. Each picture shows one transform.">
-  <meta name="theme-color" content="#f3eee6">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,720&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/studio.css">
 </head>
-<body class="hub" data-view="list">
-  <p class="spine">Seen Geometry lessons</p>
-  <header class="mast">
-    <h1><span>Seen</span><span class="shift">Geometry</span></h1>
-    <p class="deck">Eight pictures. A matrix you can point at. Browse the lessons as a list, a gallery, a loop, or a spiral.</p>
-  </header>
-  <div class="modes" role="group" aria-label="How to browse the lessons">
-    <button type="button" data-view="list" aria-pressed="true">List</button>
-    <button type="button" data-view="gallery" aria-pressed="false">Gallery</button>
-    <button type="button" data-view="loop" aria-pressed="false">Loop</button>
-    <button type="button" data-view="spiral" aria-pressed="false">Spiral</button>
-  </div>
-  <div class="reel" id="reel">
-    <ol class="index" id="index">
+<body>
+  <div class="plate">
+    <div class="arc a" aria-hidden="true"></div>
+    <div class="arc b" aria-hidden="true"></div>
+    <span class="reg tl" aria-hidden="true"></span>
+    <span class="reg tr" aria-hidden="true"></span>
+    <span class="reg bl" aria-hidden="true"></span>
+    <span class="reg br" aria-hidden="true"></span>
+    <svg class="protractor" id="protractor" viewBox="0 0 420 210" aria-hidden="true"></svg>
+    <header class="hero">
+      <p class="rev">Eight lessons</p>
+      <h1><span>Seen</span><span class="open">Geometry</span></h1>
+      <div class="dimension" aria-hidden="true">
+        <svg viewBox="0 0 640 28" preserveAspectRatio="none">
+          <line x1="14" y1="14" x2="626" y2="14" stroke="#d01212" stroke-width="1.5" vector-effect="non-scaling-stroke"></line>
+          <path d="M2 14 L16 7 L16 21 Z" fill="#d01212"></path>
+          <path d="M638 14 L624 7 L624 21 Z" fill="#d01212"></path>
+        </svg>
+        <span>8 lessons</span>
+      </div>
+      <p class="deck">Eight pictures. Each one is a matrix acting on a shape.</p>
+    </header>
+    <ol class="bom">
       <li>
         <a href="demos/01-instanced-field.html">
-          <span class="num">01</span>
+          <span class="balloon">01</span>
           <span>
-            <strong>Instanced field</strong>
-            <em>One box. Many matrices. Every copy is drawn in one pass.</em>
+            <h2>Instanced field</h2>
+            <p>One box. Many matrices. Every copy is drawn in one pass.</p>
           </span>
         </a>
       </li>
       <li>
         <a href="demos/02-morph-targets.html">
-          <span class="num">02</span>
+          <span class="balloon">02</span>
           <span>
-            <strong>Morph targets</strong>
-            <em>Spike and squash. Two weights move the same points.</em>
+            <h2>Morph targets</h2>
+            <p>Spike and squash. Two weights move the same points.</p>
           </span>
         </a>
       </li>
       <li>
         <a href="demos/03-compose-transforms.html">
-          <span class="num">03</span>
+          <span class="balloon">03</span>
           <span>
-            <strong>Order of transforms</strong>
-            <em>Same translate, rotate, and scale. Three products. Three pictures.</em>
+            <h2>Order of transforms</h2>
+            <p>Same translate, rotate, and scale. Three products. Three pictures.</p>
           </span>
         </a>
       </li>
       <li>
         <a href="demos/04-point-vs-direction.html">
-          <span class="num">04</span>
+          <span class="balloon">04</span>
           <span>
-            <strong>Point vs direction</strong>
-            <em>w = 1 moves. w = 0 stays. Same translation.</em>
+            <h2>Point vs direction</h2>
+            <p>w = 1 moves. w = 0 stays. Same translation.</p>
           </span>
         </a>
       </li>
       <li>
         <a href="demos/05-shear.html">
-          <span class="num">05</span>
+          <span class="balloon">05</span>
           <span>
-            <strong>Shear</strong>
-            <em>The area stays 1. The corner angle changes.</em>
+            <h2>Shear</h2>
+            <p>The area stays 1. The corner angle changes.</p>
           </span>
         </a>
       </li>
       <li>
         <a href="demos/06-determinant.html">
-          <span class="num">06</span>
+          <span class="balloon">06</span>
           <span>
-            <strong>Determinant and reflection</strong>
-            <em>A negative determinant flips the shape. Zero flattens it.</em>
+            <h2>Determinant and reflection</h2>
+            <p>A negative determinant flips the shape. Zero flattens it.</p>
           </span>
         </a>
       </li>
       <li>
         <a href="demos/07-fold.html">
-          <span class="num">07</span>
+          <span class="balloon">07</span>
           <span>
-            <strong>Fold</strong>
-            <em>A crease reflects the sheet. The mark flips.</em>
+            <h2>Fold</h2>
+            <p>A crease reflects the sheet. The mark flips.</p>
           </span>
         </a>
       </li>
       <li>
         <a href="demos/08-rotation.html">
-          <span class="num">08</span>
+          <span class="balloon">08</span>
           <span>
-            <strong>Rotation</strong>
-            <em>A point on the circle. Two folds make one turn.</em>
+            <h2>Rotation</h2>
+            <p>A point on the circle. Two folds make one turn.</p>
           </span>
         </a>
       </li>
     </ol>
+    <aside class="block">
+      <p>Seen Geometry</p>
+      <p>Sheet 1</p>
+      <p>Scale 1 : 1</p>
+      <p>Lessons 01–08</p>
+      <p class="span">This is a sample teaching page. <a href="https://github.com/virgilrenfroe/seen-geometry/blob/main/README.md">README</a>.</p>
+    </aside>
   </div>
-  <footer class="colophon">
-    <p>This is a sample teaching page. <a href="https://github.com/virgilrenfroe/seen-geometry/blob/main/README.md">README</a>.</p>
-  </footer>
   <script>
     (function () {
-      var root = document.body;
-      var buttons = document.querySelectorAll('.modes button');
-      var reel = document.getElementById('reel');
-      var index = document.getElementById('index');
-      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!reduce && reel && index) {
-        var clone = index.cloneNode(true);
-        clone.removeAttribute('id');
-        clone.setAttribute('aria-hidden', 'true');
-        clone.querySelectorAll('a').forEach(function (link) { link.tabIndex = -1; });
-        reel.appendChild(clone);
+      var svg = document.getElementById("protractor");
+      var ns = "http://www.w3.org/2000/svg";
+      var cx = 210, cy = 198, R = 176;
+      function el(name, attrs) {
+        var n = document.createElementNS(ns, name);
+        Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+        svg.appendChild(n);
+        return n;
       }
-      buttons.forEach(function (button) {
-        button.addEventListener('click', function () {
-          root.setAttribute('data-view', button.getAttribute('data-view'));
-          buttons.forEach(function (item) {
-            item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
-          });
-        });
+      el("path", {
+        d: "M " + (cx - R) + " " + cy + " A " + R + " " + R + " 0 0 1 " + (cx + R) + " " + cy,
+        fill: "none", stroke: "currentColor", "stroke-width": "1.15"
       });
+      el("line", { x1: cx - R, y1: cy, x2: cx + R, y2: cy, stroke: "currentColor", "stroke-width": "1.15" });
+      for (var deg = 0; deg <= 180; deg += 5) {
+        var rad = deg * Math.PI / 180;
+        var c = Math.cos(rad), s = Math.sin(rad);
+        var inner = deg % 10 === 0 ? 18 : 8;
+        el("line", {
+          x1: cx + (R - inner) * c, y1: cy - (R - inner) * s,
+          x2: cx + R * c, y2: cy - R * s,
+          stroke: "currentColor", "stroke-width": deg % 30 === 0 ? "1.4" : "1"
+        });
+        if (deg % 30 === 0) {
+          var t = el("text", {
+            x: cx + (R - 30) * c, y: cy - (R - 30) * s,
+            "text-anchor": "middle", "dominant-baseline": "middle",
+            "font-size": "10", "font-family": "Space Mono, monospace"
+          });
+          t.textContent = String(deg);
+        }
+      }
     }());
   </script>
 </body>

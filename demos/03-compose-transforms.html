@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Order of transforms — Seen Geometry</title>
   <meta name="description" content="The same translate, rotate, and scale, multiplied in three orders. The pictures are different.">
-  <meta name="theme-color" content="#f3eee6">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,7 +127,7 @@
     const orders = {
       trs: {
         name: 'T · R · S',
-        color: 0xc4622d,
+        color: 0xd01212,
         blurb: 'Scale first. Then rotate. Then translate. The arrow turns about its tail. Then it steps along X.',
         multiply(T, R, S) {
           return new THREE.Matrix4().copy(T).multiply(R).multiply(S);
@@ -135,7 +135,7 @@
       },
       rts: {
         name: 'R · T · S',
-        color: 0x2f6a4f,
+        color: 0x1a1f1a,
         blurb: 'Scale first. Then translate. Then rotate. The move happens before the turn. The arrow swings around the origin.',
         multiply(T, R, S) {
           return new THREE.Matrix4().copy(R).multiply(T).multiply(S);
@@ -143,7 +143,7 @@
       },
       srt: {
         name: 'S · R · T',
-        color: 0x243e66,
+        color: 0x8a9388,
         blurb: 'Translate first. Then rotate. Then scale. Scale is last, along the vertical axis. It stretches the picture after the turn.',
         multiply(T, R, S) {
           return new THREE.Matrix4().copy(S).multiply(R).multiply(T);
@@ -193,7 +193,7 @@
       renderer.toneMapping = THREE.NoToneMapping;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf3eee6);
+      scene.background = new THREE.Color(0xe7efe4);
       const camera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 40);
       camera.position.set(0, 0, 12);
       camera.lookAt(0, 0, 0);
@@ -205,7 +205,7 @@
       ids.forEach((id) => {
         const order = orders[id];
         const pivot = new THREE.Group();
-        const grid = new THREE.GridHelper(6, 6, 0xb7ad9f, 0xddd6cb);
+        const grid = new THREE.GridHelper(6, 6, 0x1a1f1a, 0xb7c0b4);
         grid.rotation.x = Math.PI / 2;
         const dot = new THREE.Mesh(
           dotGeometry,

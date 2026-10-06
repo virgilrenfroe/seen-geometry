@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Instanced field — Seen Geometry</title>
   <meta name="description" content="One box, drawn many times. Each copy has its own matrix. The computer draws every copy in one pass.">
-  <meta name="theme-color" content="#f3eee6">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -107,7 +107,7 @@
     const partsEl = document.getElementById('parts');
     const matrixTable = document.getElementById('matrix');
 
-    const PAPER = 0xf3eee6;
+    const PAPER = 0xe7efe4;
     const records = [];
     let mesh;
     let selected = 0;
@@ -138,8 +138,8 @@
       });
       const field = new THREE.InstancedMesh(geometry, material, count);
       const dummy = new THREE.Object3D();
-      const sand = new THREE.Color('#efd3b0');
-      const clay = new THREE.Color('#c4622d');
+      const sand = new THREE.Color('#c5cdc0');
+      const clay = new THREE.Color('#1a1f1a');
       const color = new THREE.Color();
       records.length = 0;
 
@@ -198,7 +198,7 @@
         '    ·    scale  1.00,  ' + record.height.toFixed(2) + ',  1.00';
       fillMatrix(record.matrix);
       records.forEach((item, itemIndex) => {
-        const paint = itemIndex === index ? new THREE.Color('#f6e27a') : item.color;
+        const paint = itemIndex === index ? new THREE.Color('#d01212') : item.color;
         mesh.setColorAt(itemIndex, paint);
       });
       mesh.instanceColor.needsUpdate = true;
@@ -224,8 +224,8 @@
       camera.position.set(span * 0.72, span * 0.78, span * 1.05);
       camera.lookAt(0, 0.65, 0);
 
-      scene.add(new THREE.HemisphereLight(0xfff8ee, 0xd9c4a8, 0.95));
-      const key = new THREE.DirectionalLight(0xfff3e2, 1.5);
+      scene.add(new THREE.HemisphereLight(0xf7faf4, 0xc5cdc0, 0.95));
+      const key = new THREE.DirectionalLight(0xffffff, 1.35);
       key.position.set(-5, 10, 6);
       scene.add(key);
       const fill = new THREE.DirectionalLight(0xd5e4f2, 0.4);

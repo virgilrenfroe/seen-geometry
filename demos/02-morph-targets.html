@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Morph targets — Seen Geometry</title>
   <meta name="description" content="A sphere with two other shapes: spike and squash. Each slider is a weight. The weights add.">
-  <meta name="theme-color" content="#f3eee6">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -182,7 +182,7 @@
       renderer.toneMapping = THREE.NoToneMapping;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf3eee6);
+      scene.background = new THREE.Color(0xe7efe4);
 
       const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
       camera.position.set(2.5, 1.25, 3.35);
@@ -191,7 +191,7 @@
       const geometry = new THREE.SphereGeometry(1.15, segments[0], segments[1]);
       addMorphs(geometry);
       const material = new THREE.MeshStandardMaterial({
-        color: 0xd06a45,
+        color: 0x1a1f1a,
         roughness: 0.58,
         metalness: 0.02
       });
@@ -200,17 +200,17 @@
 
       const disc = new THREE.Mesh(
         new THREE.CircleGeometry(2.15, narrow ? 32 : 56),
-        new THREE.MeshBasicMaterial({ color: 0xe7dccb })
+        new THREE.MeshBasicMaterial({ color: 0xd5ddd0 })
       );
       disc.rotation.x = -Math.PI / 2;
       disc.position.y = -1.32;
       scene.add(disc);
 
-      scene.add(new THREE.HemisphereLight(0xfff8ee, 0xe7d3bc, 0.78));
-      const key = new THREE.DirectionalLight(0xfff1e0, 1.75);
+      scene.add(new THREE.HemisphereLight(0xf7faf4, 0xc5cdc0, 0.78));
+      const key = new THREE.DirectionalLight(0xffffff, 1.55);
       key.position.set(3.4, 5.2, 4.2);
       scene.add(key);
-      const rim = new THREE.DirectionalLight(0xf0c9a0, 0.9);
+      const rim = new THREE.DirectionalLight(0xd01212, 0.35);
       rim.position.set(-4.2, 2.2, -3.2);
       scene.add(rim);
 

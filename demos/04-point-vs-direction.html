@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Point vs direction — Seen Geometry</title>
   <meta name="description" content="The same arrow as a point (w = 1) and as a direction (w = 0). Translation moves only the point.">
-  <meta name="theme-color" content="#f3eee6">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,7 +178,7 @@
       renderer.toneMapping = THREE.NoToneMapping;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf3eee6);
+      scene.background = new THREE.Color(0xe7efe4);
       const camera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 40);
       camera.position.set(0, 0, 12);
       camera.lookAt(0, 0, 0);
@@ -188,7 +188,7 @@
 
       function makeSlot(color) {
         const pivot = new THREE.Group();
-        const grid = new THREE.GridHelper(6, 6, 0xb7ad9f, 0xddd6cb);
+        const grid = new THREE.GridHelper(6, 6, 0x1a1f1a, 0xb7c0b4);
         grid.rotation.x = Math.PI / 2;
         const dot = new THREE.Mesh(dotGeometry, new THREE.MeshBasicMaterial({ color: 0x141210 }));
         dot.position.z = 0.16;
@@ -202,8 +202,8 @@
         return { pivot, arrow };
       }
 
-      const point = makeSlot(0xff3d1a);
-      const direction = makeSlot(0x243e66);
+      const point = makeSlot(0xd01212);
+      const direction = makeSlot(0x1a1f1a);
       scene.add(new THREE.AmbientLight(0xffffff, 1));
 
       function wideEnough() {

@@ -31,7 +31,7 @@ A useful order for a class:
 5. In demo 05, sweep the shear. The area stays 1. The corner angle changes. Then switch the shear from X to Y.
 6. In demo 06, press Reflect across Y. The determinant turns negative and the F reads backwards. Press Squash to a line. The determinant becomes 0 and the F lies on that line.
 7. In demo 07, watch the sheet fold. The determinant stays −1, so the mark flips. Then move the crease off the origin and read the three-step product.
-8. In demo 08, drag the point around the circle and let it settle. The determinant stays 1. Turn on two folds. The turn is twice the angle between the creases.
+8. In demo 08, drag the point around the circle. The determinant stays 1. Turn on two folds. The turn is twice the angle between the creases.
 
 ## Run locally
 
@@ -63,3 +63,7 @@ A root `Dockerfile` serves the same files with nginx. `railway.toml` tells Railw
 - If the picture cannot load, the page says so instead of sitting on a blank canvas.
 
 Type is [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque), [Instrument Sans](https://fonts.google.com/specimen/Instrument+Sans), and [Space Mono](https://fonts.google.com/specimen/Space+Mono), with a system-font fallback. Each lesson is one HTML file under `demos/`, so the source of a single page is the whole lesson.
+
+## Design
+
+The pages are a drafting plate. The ground is graph paper. Titles, arcs, and dimension marks sit on that grid in ink, with one red for the measure. The hub is one plate of eight lessons. A crease is a construction line. The unit circle is a compass arc.

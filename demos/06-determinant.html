@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Determinant and reflection — Seen Geometry</title>
   <meta name="description" content="Drag i and j. The area of the image equals the absolute value of the determinant. A negative determinant flips the F.">
-  <meta name="theme-color" content="#f3eee6">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +34,7 @@
   <section class="dock" aria-label="Determinant">
     <p class="index-no">06</p>
     <h1>Determinant</h1>
-    <p class="lede">Drag the two tips. The signal tip is i. The navy tip is j. The determinant is the signed area of the parallelogram.</p>
+    <p class="lede">Drag the two tips. The red tip is i. The ink tip is j. The determinant is the signed area of the parallelogram.</p>
     <div class="orders" role="group" aria-label="Preset matrices">
       <button type="button" data-preset="id" aria-pressed="true">Identity</button>
       <button type="button" data-preset="reflect" aria-pressed="false">Reflect across Y</button>
@@ -155,12 +155,12 @@
       renderer.toneMapping = THREE.NoToneMapping;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf3eee6);
+      scene.background = new THREE.Color(0xe7efe4);
       const camera = new THREE.OrthographicCamera(-3, 3, 3, -3, 0.1, 30);
       camera.position.set(0, 0, 10);
       camera.lookAt(0, 0, 0);
 
-      const grid = new THREE.GridHelper(6, 6, 0xb7ad9f, 0xddd6cb);
+      const grid = new THREE.GridHelper(6, 6, 0x1a1f1a, 0xb7c0b4);
       grid.rotation.x = Math.PI / 2;
       grid.position.z = -0.05;
       scene.add(grid);
@@ -174,7 +174,7 @@
 
       const world = new THREE.Group();
       world.matrixAutoUpdate = false;
-      const paraMat = new THREE.MeshBasicMaterial({ color: 0xc9d7c8, side: THREE.DoubleSide });
+      const paraMat = new THREE.MeshBasicMaterial({ color: 0xd7e0d2, side: THREE.DoubleSide });
       const para = new THREE.Mesh(new THREE.ShapeGeometry(square), paraMat);
       para.position.z = 0;
       const letter = new THREE.Mesh(
@@ -201,8 +201,8 @@
         scene.add(mesh);
         return mesh;
       }
-      const iArrow = makeVector(0xff3d1a);
-      const jArrow = makeVector(0x243e66);
+      const iArrow = makeVector(0xd01212);
+      const jArrow = makeVector(0x1a1f1a);
 
       function makeHandle(color) {
         const mesh = new THREE.Mesh(
@@ -213,8 +213,8 @@
         scene.add(mesh);
         return mesh;
       }
-      const iHandle = makeHandle(0xff3d1a);
-      const jHandle = makeHandle(0x243e66);
+      const iHandle = makeHandle(0xd01212);
+      const jHandle = makeHandle(0x1a1f1a);
       iHandle.name = 'i';
       jHandle.name = 'j';
 
@@ -298,7 +298,7 @@
         const det = iHat.x * jHat.y - iHat.y * jHat.x;
         const area = Math.abs(det);
         const collapsed = Math.abs(det) < 0.02;
-        paraMat.color.setHex(collapsed ? 0xd9d0c6 : det < 0 ? 0xf0c4b6 : 0xc9d7c8);
+        paraMat.color.setHex(collapsed ? 0xd5ddd0 : det < 0 ? 0xf0c8c4 : 0xd7e0d2);
         world.matrix.copy(linearMatrix());
         world.matrixWorldNeedsUpdate = true;
         iArrow.matrix.copy(arrowMatrix(iHat.x, iHat.y));

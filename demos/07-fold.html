@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fold — Seen Geometry</title>
   <meta name="description" content="A sheet folds across a crease. The fold is a reflection, so the mark flips and the determinant is −1.">
-  <meta name="theme-color" content="#e4d8c8">
+  <meta name="theme-color" content="#e7efe4">
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +44,7 @@
       <span>Offset <output id="offset-out">−0.32</output></span>
       <input id="offset" type="range" min="-0.65" max="0.65" step="0.01" value="-0.32">
     </label>
-    <p class="fine">The signal handle turns the crease. The dark handle slides it. A fold always flips handedness, as on the determinant page.</p>
+    <p class="fine">The red mark turns the crease. The ink mark slides it. A fold always flips handedness, as on the determinant page.</p>
     <table class="matrix" id="matrix">
       <caption id="matrix-caption">Reflection across the crease.</caption>
       <tbody></tbody>
@@ -122,23 +122,23 @@
       renderer.toneMapping = THREE.NoToneMapping;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xe4d8c8);
+      scene.background = new THREE.Color(0xe7efe4);
       const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
       const camPos = new THREE.Vector3(0.15, -3.1, 2.5);
       const camVel = new THREE.Vector3();
       const look = new THREE.Vector3(0, 0, 0);
 
-      scene.add(new THREE.HemisphereLight(0xfff8ef, 0xd9c8b4, 0.95));
-      const key = new THREE.DirectionalLight(0xfff4e8, 1.15);
+      scene.add(new THREE.HemisphereLight(0xf7faf4, 0xc5cdc0, 0.95));
+      const key = new THREE.DirectionalLight(0xffffff, 1.05);
       key.position.set(-2.2, -3.4, 4.2);
       scene.add(key);
-      const fill = new THREE.DirectionalLight(0xf0d2c2, 0.35);
+      const fill = new THREE.DirectionalLight(0xd5ddd0, 0.35);
       fill.position.set(2.4, 1.2, 2);
       scene.add(fill);
 
       const table = new THREE.Mesh(
         new THREE.PlaneGeometry(4.4, 3.2),
-        new THREE.MeshLambertMaterial({ color: 0xd9cbb8 })
+        new THREE.MeshLambertMaterial({ color: 0xd5ddd0 })
       );
       table.position.z = -0.06;
       scene.add(table);
@@ -154,28 +154,28 @@
       creaseGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(18), 3));
       const crease = new THREE.Mesh(
         creaseGeo,
-        new THREE.MeshBasicMaterial({ color: 0x141210, side: THREE.DoubleSide })
+        new THREE.MeshBasicMaterial({ color: 0xd01212, side: THREE.DoubleSide })
       );
       scene.add(crease);
 
       function makeHandle(color) {
         const mesh = new THREE.Mesh(
-          new THREE.CircleGeometry(0.11, 28),
+          new THREE.PlaneGeometry(0.16, 0.16),
           new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })
         );
         mesh.position.z = 0.18;
         scene.add(mesh);
         return mesh;
       }
-      const angleHandle = makeHandle(0xff3d1a);
+      const angleHandle = makeHandle(0xd01212);
       const slideHandle = makeHandle(0x141210);
 
       const frontMat = new THREE.MeshBasicMaterial({ color: 0x141210, side: THREE.FrontSide });
       const backMat = new THREE.MeshBasicMaterial({ color: 0x141210, side: THREE.DoubleSide });
       const ghostMat = new THREE.MeshBasicMaterial({
-        color: 0x243e66,
+        color: 0x1a1f1a,
         transparent: true,
-        opacity: 0.9,
+        opacity: 0.4,
         side: THREE.DoubleSide,
         depthWrite: false
       });
@@ -241,7 +241,7 @@
         const colors = new Float32Array(pos.count * 3);
         for (let i = 0; i < pos.count; i += 1) {
           const nz = norm.getZ(i);
-          const color = nz > 0.45 ? [0.969, 0.945, 0.910] : nz < -0.45 ? [0.831, 0.322, 0.196] : [0.851, 0.784, 0.706];
+          const color = nz > 0.45 ? [0.906, 0.937, 0.894] : nz < -0.45 ? [0.847, 0.878, 0.835] : [0.102, 0.122, 0.102];
           colors[i * 3] = color[0];
           colors[i * 3 + 1] = color[1];
           colors[i * 3 + 2] = color[2];
@@ -399,20 +399,19 @@
       }
 
       function springAngle(value, vel, target, dt) {
-        const accel = wrap(target - value) * (reduce ? 0 : 62) - vel * (reduce ? 0 : 9.5);
         if (reduce) return [target, 0];
-        vel += accel * dt;
-        value = wrap(value + vel * dt);
-        return [value, vel];
+        const follow = 1 - Math.exp(-12 * dt);
+        return [wrap(value + wrap(target - value) * follow), 0];
       }
 
       function springLinear(value, vel, target, k, damp, dt, min, max) {
-        if (reduce) return [Math.min(max, Math.max(min, target)), 0];
-        vel += ((target - value) * k - vel * damp) * dt;
-        value += vel * dt;
-        if (value < min) { value = min; vel = 0; }
-        if (value > max) { value = max; vel = 0; }
-        return [value, vel];
+        const clamped = Math.min(max, Math.max(min, target));
+        if (reduce) return [clamped, 0];
+        const follow = 1 - Math.exp(-10 * dt);
+        let next = value + (clamped - value) * follow;
+        if (next < min) next = min;
+        if (next > max) next = max;
+        return [next, 0];
       }
 
       function frame() {
@@ -432,12 +431,7 @@
         const open = dragging || fold < 2.35;
         const aim = open ? new THREE.Vector3(1.15, -2.35, 2.15) : new THREE.Vector3(0.2, -3.15, 2.85);
         if (reduce) camPos.copy(aim);
-        else {
-          camVel.x += ((aim.x - camPos.x) * 6 - camVel.x * 5.5) * dt;
-          camVel.y += ((aim.y - camPos.y) * 6 - camVel.y * 5.5) * dt;
-          camVel.z += ((aim.z - camPos.z) * 6 - camVel.z * 5.5) * dt;
-          camPos.addScaledVector(camVel, dt);
-        }
+        else camPos.lerp(aim, 1 - Math.exp(-8 * dt));
         camera.position.copy(camPos);
         camera.lookAt(look);
         const keyState = theta.toFixed(3) + ':' + dist.toFixed(3);
