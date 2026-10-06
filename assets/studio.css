@@ -456,6 +456,11 @@ input[type="number"] {
   gap: 0.35rem;
   pointer-events: none;
 }
+.stamps.pair {
+  flex-direction: row;
+  flex-wrap: wrap;
+  max-width: calc(100% - 1.4rem);
+}
 .stamps p {
   margin: 0;
   font-family: var(--mono);

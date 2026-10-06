@@ -26,6 +26,7 @@ An educator directed AI agents to build these pages. The author is not a softwar
 | [13 Dot product](demos/13-dot-product.html) | Drag arrows a and b. Read a·b = \|a\|\|b\|cos θ, the angle, and the shadow of a on b. With a = (3, 0) and b = (2, 2), the dot product is 6 and the angle is 45°. At 90° the dot product is 0. |
 | [14 Cross product](demos/14-cross-product.html) | Drag arrows a and b in the plane. The red arrow is a × b and stands perpendicular to both. Its length is the area \|a\|\|b\|sin θ. With a = (3, 0, 0) and b = (0, 2, 0), the cross product is (0, 0, 6) and the area is 6. Swap the arrows and it becomes (0, 0, −6). |
 | [15 Orthonormal basis](demos/15-orthonormal.html) | Start with u = (3, 1) and v = (1, 2). Gram-Schmidt keeps a unit arrow along u, subtracts the shadow of v, and normalizes the remainder. |e1| and |e2| are 1, and e1 · e2 is 0. Add e3 = e1 × e2 for a right-handed frame. |
+| [16 Change of basis](demos/16-change-of-basis.html) | v = (3, 1) stays fixed. Turn the frame. At 45°, the page pair is (3, 1) and the frame pair is about (2.83, −1.41). The squares of the frame coordinates add up to \|v\|². At 0° the two pairs match. |
 
 Each lesson has a short note, “Where this is used.” It names fields and jobs where the idea appears.
 
@@ -48,6 +49,7 @@ A useful order for a class:
 13. In demo 13, leave the arrows at a = (3, 0) and b = (2, 2). The dot product is 6 and the angle is 45°. Then drag b until the arrows are perpendicular. The dot product becomes 0 and the angle mark turns red.
 14. In demo 14, leave the arrows at a = (3, 0, 0) and b = (0, 2, 0). The cross product is (0, 0, 6) and the area is 6. Press Swap a and b. The red arrow flips and the cross product is (0, 0, −6). Then line the arrows up. The area and the cross product both become 0.
 15. In demo 15, leave the arrows at u = (3, 1) and v = (1, 2). Press Orthonormal frame. |e1| and |e2| are 1, and e1 · e2 is 0. The arrows are red. Then press Add e3 and watch the third arrow stand up.
+16. In demo 16, leave v at (3, 1) and the frame at 45°. Read both coordinate pairs. The squares of the frame coordinates add up to the square of the length of v. Slide the angle to 0°. The two pairs match.
 
 ## Run locally
 
@@ -82,4 +84,4 @@ Type is [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotes
 
 ## Design
 
-The pages are a drafting plate. The ground is graph paper. Titles, arcs, and dimension marks sit on that grid in ink, with one red for the measure. The hub is one plate of fifteen lessons. A crease is a construction line. The unit circle is a compass arc.
+The pages are a drafting plate. The ground is graph paper. Titles, arcs, and dimension marks sit on that grid in ink, with one red for the measure. The hub is one plate of sixteen lessons. A crease is a construction line. The unit circle is a compass arc.

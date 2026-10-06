@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Change of basis — Seen Geometry</title>
+  <meta name="description" content="A fixed arrow on the page. Turn an orthonormal frame and read the same arrow in two coordinate pairs.">
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">16 · Change of basis</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="A fixed arrow on graph paper. A red frame can turn. Dashed lines drop the arrow onto the frame axes."></canvas>
+    <div class="stamps pair">
+      <p data-kind="dir" id="stamp-std">x, y  3.00,  1.00</p>
+      <p data-kind="point" id="stamp-frame">x′, y′  2.83,  -1.41</p>
+    </div>
+    <p class="dim-tag" id="tag-x">2.83</p>
+    <p class="dim-tag" id="tag-y">-1.41</p>
+  </div>
+  <section class="dock" aria-label="Change of basis">
+    <p class="index-no">16</p>
+    <h1>Change of basis</h1>
+    <p class="lede">The arrow v is fixed on the page. Slide the angle to turn the red frame. The pair (x, y) is v in the page axes. The pair (x′, y′) is the same arrow in the frame. Each primed coordinate is a shadow: a dot product with one red axis.</p>
+    <label class="field">
+      <span>Frame angle <output id="angle-out">45°</output></span>
+      <input id="angle" type="range" min="-180" max="180" step="1" value="45" aria-label="Angle of the frame">
+    </label>
+    <p id="blurb">The frame has turned 45° from the page axes. The page coordinates stay (3.00, 1.00). In the frame, the coordinates are the shadows of v on e1 and on e2.</p>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch"></span><span>v</span><span id="v-out">3.00,  1.00</span></li>
+      <li><span class="swatch navy"></span><span>(x, y)</span><span id="std-out">3.00,  1.00</span></li>
+      <li><span class="swatch clay"></span><span>(x′, y′)</span><span id="frame-out">2.83,  -1.41</span></li>
+      <li><span class="swatch"></span><span>e1</span><span id="e1-out">0.71,  0.71</span></li>
+      <li><span class="swatch"></span><span>e2</span><span id="e2-out">-0.71,  0.71</span></li>
+      <li><span class="swatch clay"></span><span>Squares</span><span id="sum-out">10.00</span></li>
+    </ul>
+    <p class="fine">x′ is v · e1 and y′ is v · e2. That dot product is <a href="13-dot-product.html">lesson 13</a>. The red arrows are an orthonormal frame, as in <a href="15-orthonormal.html">lesson 15</a>. The matrix P has those arrows as its columns. The frame coordinates are P inverse times the page coordinates: [v]<sub>e</sub> = P⁻¹ [v]<sub>std</sub>. <a href="11-inverse.html">Lesson 11</a> builds that inverse.</p>
+    <table class="matrix measure" id="matrix-p">
+      <caption>P. The columns are e1 and e2. Read each row from left to right.</caption>
+      <tbody>
+        <tr><td>0.71</td><td>-0.71</td></tr>
+        <tr><td>0.71</td><td>0.71</td></tr>
+      </tbody>
+    </table>
+    <table class="matrix measure" id="matrix-inv">
+      <caption>P inverse. For this frame, rows and columns swap.</caption>
+      <tbody>
+        <tr><td>0.71</td><td>0.71</td></tr>
+        <tr><td>-0.71</td><td>0.71</td></tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <button type="button" class="quiet" id="reset">Reset angle</button>
+    </div>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>In a game engine and in film visual effects, a camera has its own axes and the scene has another. A graphics programmer or a visual effects artist converts a point from world coordinates into the camera frame, and back.</li>
+        <li>In CAD and in mechanical design, a hole is stored in the part's own axes. A CAD specialist or a mechanical designer then places that part into the assembly, which uses another frame.</li>
+        <li>In aerospace and in robotics, the body frame rides with the craft and the inertial frame stays with the ground. An aerospace engineer or a robotics engineer reads the same velocity in both frames.</li>
+        <li>Related idea. In data science, principal component analysis gives a new frame for the points. A data scientist writes each point in those feature coordinates. The axes are eigenvectors. <a href="12-eigenvectors.html">Lesson 12</a> shows eigenvectors.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="15-orthonormal.html">Orthonormal basis</a> · <a href="../index.html">Lessons</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html">09 Projection</a>
+      <a href="10-perspective.html">10 Perspective</a>
+      <a href="11-inverse.html">11 Inverse</a>
+      <a href="12-eigenvectors.html">12 Eigenvectors</a>
+      <a href="13-dot-product.html">13 Dot product</a>
+      <a href="14-cross-product.html">14 Cross product</a>
+      <a href="15-orthonormal.html">15 Orthonormal basis</a>
+      <a href="16-change-of-basis.html" aria-current="page">16 Change of basis</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="11-inverse.html" tabindex="-1" aria-hidden="true">11 Inverse</a>
+      <a class="reel-clone" href="12-eigenvectors.html" tabindex="-1" aria-hidden="true">12 Eigenvectors</a>
+      <a class="reel-clone" href="13-dot-product.html" tabindex="-1" aria-hidden="true">13 Dot product</a>
+      <a class="reel-clone" href="14-cross-product.html" tabindex="-1" aria-hidden="true">14 Cross product</a>
+      <a class="reel-clone" href="15-orthonormal.html" tabindex="-1" aria-hidden="true">15 Orthonormal basis</a>
+      <a class="reel-clone" href="16-change-of-basis.html" tabindex="-1" aria-hidden="true">16 Change of basis</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const blurb = document.getElementById('blurb');
+    const factors = document.getElementById('factors');
+    const angleInput = document.getElementById('angle');
+    const angleOut = document.getElementById('angle-out');
+    const tagX = document.getElementById('tag-x');
+    const tagY = document.getElementById('tag-y');
+
+    const INK = 0x1a1f1a;
+    const PENCIL = 0x5c665c;
+    const SIGNAL = 0xd01212;
+    const PAPER = 0xe7efe4;
+    const v = new THREE.Vector2(3, 1);
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function fmtDeg(deg) {
+      const nearest = Math.round(deg);
+      if (Math.abs(deg - nearest) < 0.06) return String(nearest);
+      return deg.toFixed(1);
+    }
+
+    function pair(x, y) {
+      return fmt(x) + ',  ' + fmt(y);
+    }
+
+    function line(label, value) {
+      return label.padEnd(12, ' ') + value;
+    }
+
+    function makeArrow() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0.07);
+      shape.lineTo(0.78, 0.07);
+      shape.lineTo(0.78, 0.18);
+      shape.lineTo(1, 0);
+      shape.lineTo(0.78, -0.18);
+      shape.lineTo(0.78, -0.07);
+      shape.lineTo(0, -0.07);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function makeBar() {
+      const geo = new THREE.PlaneGeometry(1, 1);
+      geo.translate(0.5, 0, 0);
+      return geo;
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+      const camera = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 30);
+      camera.position.set(0, 0, 12);
+      camera.lookAt(0, 0, 0);
+
+      const grid = new THREE.GridHelper(10, 10, INK, 0xb7c0b4);
+      grid.rotation.x = Math.PI / 2;
+      grid.position.z = -0.08;
+      scene.add(grid);
+
+      function makeLine(count, color, dashed) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+        const material = dashed
+          ? new THREE.LineDashedMaterial({ color, dashSize: 0.12, gapSize: 0.07 })
+          : new THREE.LineBasicMaterial({ color });
+        const line = new THREE.Line(geometry, material);
+        line.frustumCulled = false;
+        return line;
+      }
+
+      const axis1 = makeLine(2, SIGNAL, false);
+      const axis2 = makeLine(2, SIGNAL, false);
+      const drops = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3)),
+        new THREE.LineDashedMaterial({ color: PENCIL, dashSize: 0.12, gapSize: 0.07 })
+      );
+      drops.frustumCulled = false;
+      const arc = makeLine(48, INK, false);
+      const circle = new THREE.LineLoop(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(80 * 3), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      circle.frustumCulled = false;
+      const corner = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3)),
+        new THREE.LineBasicMaterial({ color: SIGNAL })
+      );
+      corner.frustumCulled = false;
+      scene.add(circle, axis1, axis2, drops, arc, corner);
+
+      const circleArr = circle.geometry.getAttribute('position').array;
+      for (let i = 0; i < 80; i += 1) {
+        const t = (i / 80) * Math.PI * 2;
+        circleArr[i * 3] = Math.cos(t);
+        circleArr[i * 3 + 1] = Math.sin(t);
+        circleArr[i * 3 + 2] = 0.02;
+      }
+      circle.geometry.getAttribute('position').needsUpdate = true;
+
+      function flatArrow(color) {
+        const mesh = new THREE.Mesh(
+          makeArrow(),
+          new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })
+        );
+        mesh.matrixAutoUpdate = false;
+        return mesh;
+      }
+      const arrowV = flatArrow(INK);
+      const arrowE1 = flatArrow(SIGNAL);
+      const arrowE2 = flatArrow(SIGNAL);
+      scene.add(arrowV, arrowE1, arrowE2);
+
+      const barGeo = makeBar();
+      const shadow1 = new THREE.Mesh(barGeo, new THREE.MeshBasicMaterial({ color: INK, side: THREE.DoubleSide }));
+      const shadow2 = new THREE.Mesh(barGeo, new THREE.MeshBasicMaterial({ color: INK, side: THREE.DoubleSide }));
+      shadow1.matrixAutoUpdate = false;
+      shadow2.matrixAutoUpdate = false;
+      scene.add(shadow1, shadow2);
+
+      const origin = new THREE.Mesh(
+        new THREE.CircleGeometry(0.055, 18),
+        new THREE.MeshBasicMaterial({ color: INK })
+      );
+      origin.position.z = 0.14;
+      scene.add(origin);
+
+      function arrowMatrix(mesh, x, y, z) {
+        const len = Math.hypot(x, y);
+        if (len < 0.04) {
+          mesh.visible = false;
+          return;
+        }
+        mesh.visible = true;
+        const ux = x / len;
+        const uy = y / len;
+        const thick = 0.9;
+        mesh.matrix.set(
+          ux * len, -uy * thick, 0, 0,
+          uy * len, ux * thick, 0, 0,
+          0, 0, 1, z,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function placeBar(mesh, from, to, width, z) {
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const len = Math.hypot(dx, dy);
+        if (len < 0.08) {
+          mesh.visible = false;
+          return;
+        }
+        mesh.visible = true;
+        const ux = dx / len;
+        const uy = dy / len;
+        mesh.matrix.set(
+          ux * len, -uy * width, 0, from.x,
+          uy * len, ux * width, 0, from.y,
+          0, 0, 1, z,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function writeLine(line, a, b, z) {
+        const arr = line.geometry.getAttribute('position').array;
+        arr[0] = a.x; arr[1] = a.y; arr[2] = z;
+        arr[3] = b.x; arr[4] = b.y; arr[5] = z;
+        line.geometry.getAttribute('position').needsUpdate = true;
+        line.geometry.setDrawRange(0, 2);
+      }
+
+      function fillTable(table, values) {
+        const cells = table.querySelectorAll('td');
+        values.forEach((n, i) => {
+          cells[i].textContent = fmt(n);
+        });
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        const aspect = width / height;
+        const halfH = 4.6;
+        camera.left = -halfH * aspect;
+        camera.right = halfH * aspect;
+        camera.top = halfH;
+        camera.bottom = -halfH;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function placeTag(el, x, y, text) {
+        const point = new THREE.Vector3(x, y, 0);
+        camera.updateMatrixWorld();
+        const projected = point.project(camera);
+        const pad = 18;
+        const sx = Math.min(stage.clientWidth - pad, Math.max(pad, (projected.x * 0.5 + 0.5) * stage.clientWidth));
+        const sy = Math.min(stage.clientHeight - pad, Math.max(pad, (-projected.y * 0.5 + 0.5) * stage.clientHeight));
+        el.hidden = false;
+        el.textContent = text;
+        el.style.left = sx + 'px';
+        el.style.top = sy + 'px';
+      }
+
+      function sync() {
+        frame();
+        const deg = Number(angleInput.value);
+        const theta = deg * Math.PI / 180;
+        const c = Math.cos(theta);
+        const s = Math.sin(theta);
+        const e1 = new THREE.Vector2(c, s);
+        const e2 = new THREE.Vector2(-s, c);
+        const xp = v.dot(e1);
+        const yp = v.dot(e2);
+        const foot1 = e1.clone().multiplyScalar(xp);
+        const foot2 = e2.clone().multiplyScalar(yp);
+        const sum = xp * xp + yp * yp;
+        const norm = v.lengthSq();
+
+        const p = [c, -s, s, c];
+        const det = p[0] * p[3] - p[1] * p[2];
+        const inv = [p[3] / det, -p[1] / det, -p[2] / det, p[0] / det];
+        const mx = inv[0] * v.x + inv[1] * v.y;
+        const my = inv[2] * v.x + inv[3] * v.y;
+        const i00 = inv[0] * p[0] + inv[1] * p[2];
+        const i01 = inv[0] * p[1] + inv[1] * p[3];
+        const i10 = inv[2] * p[0] + inv[3] * p[2];
+        const i11 = inv[2] * p[1] + inv[3] * p[3];
+
+        const reach = 4.35;
+        writeLine(axis1, e1.clone().multiplyScalar(-reach), e1.clone().multiplyScalar(reach), 0.03);
+        writeLine(axis2, e2.clone().multiplyScalar(-reach), e2.clone().multiplyScalar(reach), 0.03);
+        arrowMatrix(arrowV, v.x, v.y, 0.08);
+        arrowMatrix(arrowE1, e1.x, e1.y, 0.1);
+        arrowMatrix(arrowE2, e2.x, e2.y, 0.1);
+        placeBar(shadow1, new THREE.Vector2(0, 0), foot1, 0.055, 0.05);
+        placeBar(shadow2, new THREE.Vector2(0, 0), foot2, 0.055, 0.05);
+
+        const dropArr = drops.geometry.getAttribute('position').array;
+        [v, foot1, v, foot2].forEach((p0, i) => {
+          dropArr[i * 3] = p0.x;
+          dropArr[i * 3 + 1] = p0.y;
+          dropArr[i * 3 + 2] = 0.04;
+        });
+        drops.geometry.getAttribute('position').needsUpdate = true;
+        drops.computeLineDistances();
+
+        if (Math.abs(deg) > 1.2) {
+          const count = 40;
+          const arr = arc.geometry.getAttribute('position').array;
+          const radius = 0.95;
+          for (let i = 0; i < count; i += 1) {
+            const t = theta * (i / (count - 1));
+            arr[i * 3] = Math.cos(t) * radius;
+            arr[i * 3 + 1] = Math.sin(t) * radius;
+            arr[i * 3 + 2] = 0.06;
+          }
+          arc.geometry.getAttribute('position').needsUpdate = true;
+          arc.geometry.setDrawRange(0, count);
+          arc.visible = true;
+        } else {
+          arc.visible = false;
+        }
+
+        const mark = 0.36;
+        const p1 = e1.clone().multiplyScalar(mark);
+        const p3 = e2.clone().multiplyScalar(mark);
+        const p2 = p1.clone().add(p3);
+        const cornerArr = corner.geometry.getAttribute('position').array;
+        [p1, p2, p2, p3].forEach((pt, i) => {
+          cornerArr[i * 3] = pt.x;
+          cornerArr[i * 3 + 1] = pt.y;
+          cornerArr[i * 3 + 2] = 0.11;
+        });
+        corner.geometry.getAttribute('position').needsUpdate = true;
+
+        const pagePair = pair(v.x, v.y);
+        const framePair = pair(xp, yp);
+        document.getElementById('stamp-std').textContent = 'x, y  ' + pagePair;
+        document.getElementById('stamp-frame').textContent = 'x′, y′  ' + framePair;
+        document.getElementById('v-out').textContent = pagePair;
+        document.getElementById('std-out').textContent = pagePair;
+        document.getElementById('frame-out').textContent = framePair;
+        document.getElementById('e1-out').textContent = pair(e1.x, e1.y);
+        document.getElementById('e2-out').textContent = pair(e2.x, e2.y);
+        document.getElementById('sum-out').textContent = fmt(sum);
+        angleOut.textContent = fmtDeg(deg) + '°';
+
+        const matched = Math.abs(xp - v.x) < 0.02 && Math.abs(yp - v.y) < 0.02;
+        document.getElementById('stamp-frame').classList.toggle('is-zero', matched);
+
+        if (Math.abs(xp) > 0.15) {
+          const mid = foot1.clone().multiplyScalar(0.55);
+          const nudge = e2.clone().multiplyScalar((Math.sign(yp) || 1) * -0.48);
+          placeTag(tagX, mid.x + nudge.x, mid.y + nudge.y, fmt(xp));
+        } else {
+          tagX.hidden = true;
+        }
+        if (Math.abs(yp) > 0.15) {
+          const mid = foot2.clone().multiplyScalar(0.55);
+          const nudge = e1.clone().multiplyScalar((Math.sign(xp) || 1) * -0.48);
+          placeTag(tagY, mid.x + nudge.x, mid.y + nudge.y, fmt(yp));
+        } else {
+          tagY.hidden = true;
+        }
+
+        fillTable(document.getElementById('matrix-p'), p);
+        fillTable(document.getElementById('matrix-inv'), inv);
+        factors.textContent = [
+          'x′ = v · e1',
+          'y′ = v · e2',
+          line('(x, y)', pagePair),
+          line('(x′, y′)', framePair),
+          line('P⁻¹ v', pair(mx, my)),
+          line('x′² + y′²', fmt(sum)),
+          line('|v|²', fmt(norm)),
+          line('P⁻¹ P', fmt(i00) + '  ' + fmt(i01) + '  ' + fmt(i10) + '  ' + fmt(i11))
+        ].join('\n');
+
+        if (matched) {
+          blurb.textContent = 'The frame lines up with the page. e1 lies on the x axis and e2 lies on the y axis. The two coordinate pairs match.';
+        } else {
+          blurb.textContent = 'The frame has turned ' + fmtDeg(deg) + '° from the page axes. The page coordinates stay (' + fmt(v.x) + ', ' + fmt(v.y) + '). In the frame, the coordinates are the shadows of v on e1 and on e2.';
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      angleInput.addEventListener('input', sync);
+      document.getElementById('reset').addEventListener('click', () => {
+        angleInput.value = '45';
+        sync();
+      });
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>
