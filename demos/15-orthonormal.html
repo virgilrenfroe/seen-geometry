@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orthonormal basis — Seen Geometry</title>
+  <meta name="description" content="Two arrows that are not perpendicular become a unit frame. Gram-Schmidt subtracts a shadow, then normalizes.">
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">15 · Orthonormal basis</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="Two arrows on graph paper. The steps turn them into a perpendicular unit frame. A third arrow can stand up from the page."></canvas>
+    <div class="stamps">
+      <p data-kind="dir" id="stamp-u">Arrow u</p>
+      <p id="stamp-v">Arrow v</p>
+      <p id="stamp-angle">θ 45°</p>
+    </div>
+    <p class="dim-tag" id="dim-tag" hidden>1.58</p>
+  </div>
+  <section class="dock" aria-label="Orthonormal basis">
+    <p class="index-no">15</p>
+    <h1>Orthonormal basis</h1>
+    <p class="lede">Drag either tip. u and v are not perpendicular. Walk the steps. First make a unit arrow along u. Then subtract the shadow of v, and divide what remains by its length. The red arrows are the frame: each has length 1, and their dot product is 0.</p>
+    <div class="orders" role="group" aria-label="Gram-Schmidt steps">
+      <button type="button" data-mode="raw" aria-pressed="true">Raw arrows</button>
+      <button type="button" data-mode="e1" aria-pressed="false">Unit e1</button>
+      <button type="button" data-mode="shadow" aria-pressed="false">Subtract the shadow</button>
+      <button type="button" data-mode="frame" aria-pressed="false">Orthonormal frame</button>
+      <button type="button" data-mode="e3" aria-pressed="false">Add e3</button>
+    </div>
+    <p id="blurb">These two arrows leave the same origin. The angle between them is not a right angle, so they are not a frame yet.</p>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch"></span><span>u</span><span id="u-out">3.00,  1.00</span></li>
+      <li><span class="swatch navy"></span><span>v</span><span id="v-out">1.00,  2.00</span></li>
+      <li><span class="swatch clay"></span><span>|e1|</span><span id="e1-len">1.00</span></li>
+      <li><span class="swatch clay"></span><span>|e2|</span><span id="e2-len">1.00</span></li>
+      <li><span class="swatch clay"></span><span>e1 · e2</span><span id="dot-out">0.00</span></li>
+      <li><span class="swatch"></span><span>Shadow</span><span id="shadow-out">1.58</span></li>
+    </ul>
+    <p class="fine">The shadow is a projection onto a line. <a href="13-dot-product.html">Lesson 13</a> finds that shadow with a dot product, and <a href="09-projection.html">lesson 09</a> projects onto a plane. The third arrow is the cross product from <a href="14-cross-product.html">lesson 14</a>.</p>
+    <div class="row">
+      <button type="button" class="quiet" id="reset">Reset arrows</button>
+    </div>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>In CAD and in BIM, a local frame sits on a wall, a floor, or a part. A CAD specialist or a BIM coordinator measures along those axes instead of the axes of the whole building.</li>
+        <li>In 3D graphics and in a game engine, a camera builds its basis from a look-at. A graphics programmer or a game developer takes the direction the camera faces, then builds a right and an up that are unit length and perpendicular.</li>
+        <li>In robotics, the end effector carries its own frame. A robotics engineer reads the gripper's position and orientation from that frame.</li>
+        <li>Related idea. In data science, principal component analysis lines the points up on perpendicular axes of spread. Those axes are eigenvectors. A data scientist uses them to summarize a cloud of points. <a href="12-eigenvectors.html">Lesson 12</a> shows eigenvectors.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="14-cross-product.html">Cross product</a> · <a href="../index.html">Lessons</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html">09 Projection</a>
+      <a href="10-perspective.html">10 Perspective</a>
+      <a href="11-inverse.html">11 Inverse</a>
+      <a href="12-eigenvectors.html">12 Eigenvectors</a>
+      <a href="13-dot-product.html">13 Dot product</a>
+      <a href="14-cross-product.html">14 Cross product</a>
+      <a href="15-orthonormal.html" aria-current="page">15 Orthonormal basis</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="11-inverse.html" tabindex="-1" aria-hidden="true">11 Inverse</a>
+      <a class="reel-clone" href="12-eigenvectors.html" tabindex="-1" aria-hidden="true">12 Eigenvectors</a>
+      <a class="reel-clone" href="13-dot-product.html" tabindex="-1" aria-hidden="true">13 Dot product</a>
+      <a class="reel-clone" href="14-cross-product.html" tabindex="-1" aria-hidden="true">14 Cross product</a>
+      <a class="reel-clone" href="15-orthonormal.html" tabindex="-1" aria-hidden="true">15 Orthonormal basis</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const narrowQuery = window.matchMedia('(max-width: 760px)');
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const blurb = document.getElementById('blurb');
+    const factors = document.getElementById('factors');
+    const dimTag = document.getElementById('dim-tag');
+    const buttons = Array.from(document.querySelectorAll('.orders button'));
+
+    const INK = 0x1a1f1a;
+    const PENCIL = 0x5c665c;
+    const SIGNAL = 0xd01212;
+    const PAPER = 0xe7efe4;
+    const HOME_U = new THREE.Vector2(3, 1);
+    const HOME_V = new THREE.Vector2(1, 2);
+    const HOME_POS = new THREE.Vector3(2.7, -3.35, 2.15);
+    const HOME_TARGET = new THREE.Vector3(0.15, 0.2, 0.28);
+
+    const u = HOME_U.clone();
+    const v = HOME_V.clone();
+    let mode = 'raw';
+    let loopOn = false;
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function fmtDeg(deg) {
+      const nearest = Math.round(deg);
+      if (Math.abs(deg - nearest) < 0.06) return String(nearest);
+      return deg.toFixed(1);
+    }
+
+    function pair(x, y) {
+      return fmt(x) + ',  ' + fmt(y);
+    }
+
+    function line(label, value) {
+      return label.padEnd(10, ' ') + value;
+    }
+
+    function makeArrow() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0.07);
+      shape.lineTo(0.78, 0.07);
+      shape.lineTo(0.78, 0.18);
+      shape.lineTo(1, 0);
+      shape.lineTo(0.78, -0.18);
+      shape.lineTo(0.78, -0.07);
+      shape.lineTo(0, -0.07);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function makeHead() {
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0);
+      shape.lineTo(-0.22, 0.09);
+      shape.lineTo(-0.22, -0.09);
+      shape.closePath();
+      return new THREE.ShapeGeometry(shape);
+    }
+
+    function makeBar() {
+      const geo = new THREE.PlaneGeometry(1, 1);
+      geo.translate(0.5, 0, 0);
+      return geo;
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+
+      const ortho = new THREE.OrthographicCamera(-4, 4, 4, -4, 0.1, 40);
+      ortho.position.set(0, 0, 12);
+      ortho.lookAt(0, 0, 0);
+
+      const persp = new THREE.PerspectiveCamera(42, 1, 0.08, 80);
+      persp.up.set(0, 0, 1);
+      persp.position.copy(HOME_POS);
+
+      const grid = new THREE.GridHelper(10, 10, INK, 0xb7c0b4);
+      grid.rotation.x = Math.PI / 2;
+      grid.position.z = -0.08;
+      scene.add(grid);
+
+      function makeLine(count, color, dashed) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 3), 3));
+        const material = dashed
+          ? new THREE.LineDashedMaterial({ color, dashSize: 0.12, gapSize: 0.07 })
+          : new THREE.LineBasicMaterial({ color });
+        const line = new THREE.Line(geometry, material);
+        line.frustumCulled = false;
+        return line;
+      }
+
+      const axis = makeLine(2, 0xb7c0b4, false);
+      const drop = makeLine(2, PENCIL, true);
+      const arc = makeLine(48, INK, false);
+      const circle = new THREE.LineLoop(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(80 * 3), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      circle.frustumCulled = false;
+      const corner = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3)),
+        new THREE.LineBasicMaterial({ color: SIGNAL })
+      );
+      corner.frustumCulled = false;
+      const extensions = new THREE.LineSegments(
+        new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(12), 3)),
+        new THREE.LineBasicMaterial({ color: PENCIL })
+      );
+      extensions.frustumCulled = false;
+      scene.add(axis, drop, arc, circle, corner, extensions);
+
+      const circleArr = circle.geometry.getAttribute('position').array;
+      for (let i = 0; i < 80; i += 1) {
+        const t = (i / 80) * Math.PI * 2;
+        circleArr[i * 3] = Math.cos(t);
+        circleArr[i * 3 + 1] = Math.sin(t);
+        circleArr[i * 3 + 2] = 0.02;
+      }
+      circle.geometry.getAttribute('position').needsUpdate = true;
+
+      const shadowBar = new THREE.Mesh(makeBar(), new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide }));
+      const dimBar = new THREE.Mesh(makeBar(), new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide }));
+      shadowBar.matrixAutoUpdate = false;
+      dimBar.matrixAutoUpdate = false;
+      scene.add(shadowBar, dimBar);
+
+      const arrowGeo = makeArrow();
+      function flatArrow(color) {
+        const mesh = new THREE.Mesh(arrowGeo, new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide }));
+        mesh.matrixAutoUpdate = false;
+        return mesh;
+      }
+      const arrowU = flatArrow(INK);
+      const arrowV = flatArrow(PENCIL);
+      const arrowE1 = flatArrow(INK);
+      const arrowE2 = flatArrow(SIGNAL);
+      const arrowW = flatArrow(PENCIL);
+      scene.add(arrowU, arrowV, arrowE1, arrowE2, arrowW);
+
+      const headGeo = makeHead();
+      const headNear = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide }));
+      const headFar = new THREE.Mesh(headGeo, new THREE.MeshBasicMaterial({ color: SIGNAL, side: THREE.DoubleSide }));
+      headNear.matrixAutoUpdate = false;
+      headFar.matrixAutoUpdate = false;
+      scene.add(headNear, headFar);
+
+      const shaftGeo = new THREE.CylinderGeometry(0.045, 0.045, 1, 14);
+      shaftGeo.rotateX(Math.PI / 2);
+      shaftGeo.translate(0, 0, 0.5);
+      const coneGeo = new THREE.ConeGeometry(0.12, 0.32, 14);
+      coneGeo.rotateX(Math.PI / 2);
+      coneGeo.translate(0, 0, 0.16);
+      const e3Mat = new THREE.MeshBasicMaterial({ color: SIGNAL });
+      const shaftE3 = new THREE.Mesh(shaftGeo, e3Mat);
+      const headE3 = new THREE.Mesh(coneGeo, e3Mat);
+      shaftE3.frustumCulled = false;
+      headE3.frustumCulled = false;
+      scene.add(shaftE3, headE3);
+
+      function makeHandle(color) {
+        const mesh = new THREE.Mesh(
+          new THREE.CircleGeometry(0.14, 20),
+          new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })
+        );
+        mesh.position.z = 0.14;
+        scene.add(mesh);
+        return mesh;
+      }
+      const handleU = makeHandle(INK);
+      const handleV = makeHandle(PENCIL);
+      const origin = new THREE.Mesh(
+        new THREE.CircleGeometry(0.055, 18),
+        new THREE.MeshBasicMaterial({ color: INK })
+      );
+      origin.position.z = 0.12;
+      scene.add(origin);
+
+      const controls = new OrbitControls(persp, canvas);
+      controls.enableDamping = !reduceMotion;
+      controls.dampingFactor = 0.08;
+      controls.target.copy(HOME_TARGET);
+      controls.minDistance = 2.2;
+      controls.maxDistance = 16;
+      controls.enabled = false;
+      controls.update();
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+      const hitPoint = new THREE.Vector3();
+      let drag = null;
+      let activeCamera = ortho;
+      let showTag = false;
+      const tagPoint = new THREE.Vector3();
+
+      function arrowMatrix(mesh, x, y, ox, oy, z) {
+        const len = Math.hypot(x, y);
+        if (len < 0.04) {
+          mesh.visible = false;
+          return;
+        }
+        mesh.visible = true;
+        const ux = x / len;
+        const uy = y / len;
+        const thick = 0.9;
+        mesh.matrix.set(
+          ux * len, -uy * thick, 0, ox,
+          uy * len, ux * thick, 0, oy,
+          0, 0, 1, z,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function placeBar(mesh, from, to, width, z) {
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const len = Math.hypot(dx, dy);
+        if (len < 1e-4) {
+          mesh.visible = false;
+          return;
+        }
+        mesh.visible = true;
+        const ux = dx / len;
+        const uy = dy / len;
+        mesh.matrix.set(
+          ux * len, -uy * width, 0, from.x,
+          uy * len, ux * width, 0, from.y,
+          0, 0, 1, z,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function placeHead(mesh, at, dir) {
+        const len = dir.length();
+        if (len < 1e-4) {
+          mesh.visible = false;
+          return;
+        }
+        mesh.visible = true;
+        const ux = dir.x / len;
+        const uy = dir.y / len;
+        mesh.matrix.set(
+          ux, -uy, 0, at.x,
+          uy, ux, 0, at.y,
+          0, 0, 1, 0.08,
+          0, 0, 0, 1
+        );
+        mesh.matrixWorldNeedsUpdate = true;
+      }
+
+      function writePoints(line, points, z) {
+        const arr = line.geometry.getAttribute('position').array;
+        points.forEach((p, i) => {
+          arr[i * 3] = p.x;
+          arr[i * 3 + 1] = p.y;
+          arr[i * 3 + 2] = z;
+        });
+        line.geometry.getAttribute('position').needsUpdate = true;
+        line.geometry.setDrawRange(0, points.length);
+        if (line.computeLineDistances) line.computeLineDistances();
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        const aspect = width / height;
+        const halfH = 4.6;
+        ortho.left = -halfH * aspect;
+        ortho.right = halfH * aspect;
+        ortho.top = halfH;
+        ortho.bottom = -halfH;
+        ortho.updateProjectionMatrix();
+        persp.aspect = aspect;
+        persp.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function clampTip(vec) {
+        const len = vec.length();
+        if (len < 1e-6) {
+          vec.set(0.55, 0);
+          return;
+        }
+        if (len < 0.55) vec.setLength(0.55);
+        else if (len > 3.7) vec.setLength(3.7);
+      }
+
+      function render() {
+        if (showTag) {
+          const projected = tagPoint.clone().project(activeCamera);
+          const pad = 16;
+          const x = Math.min(stage.clientWidth - pad, Math.max(pad, (projected.x * 0.5 + 0.5) * stage.clientWidth));
+          const y = Math.min(stage.clientHeight - pad, Math.max(pad, (-projected.y * 0.5 + 0.5) * stage.clientHeight));
+          dimTag.hidden = projected.z > 1;
+          dimTag.style.left = x + 'px';
+          dimTag.style.top = y + 'px';
+        } else {
+          dimTag.hidden = true;
+        }
+        renderer.render(scene, activeCamera);
+      }
+
+      function placeE3(zLen) {
+        const len = Math.abs(zLen);
+        const sign = Math.sign(zLen) || 1;
+        if (len < 0.05) {
+          shaftE3.visible = false;
+          headE3.visible = false;
+          return;
+        }
+        const headLen = Math.min(0.32, len * 0.34);
+        const shaftLen = Math.max(len - headLen, 0.02);
+        shaftE3.visible = true;
+        headE3.visible = true;
+        shaftE3.scale.set(1, 1, sign * shaftLen);
+        shaftE3.position.set(0, 0, 0);
+        const s = headLen / 0.32;
+        headE3.scale.set(s, s, sign * s);
+        headE3.position.set(0, 0, sign * shaftLen);
+      }
+
+      function sync() {
+        frame();
+        const lu = u.length();
+        const lv = v.length();
+        const e1 = u.clone().multiplyScalar(1 / lu);
+        const shadow = v.dot(e1);
+        const foot = e1.clone().multiplyScalar(shadow);
+        const w = v.clone().sub(foot);
+        const lw = w.length();
+        const parallel = lw < 0.08;
+        const e2 = parallel ? new THREE.Vector2() : w.clone().multiplyScalar(1 / lw);
+        const dot = parallel ? NaN : e1.dot(e2);
+        const e3z = parallel ? 0 : e1.x * e2.y - e1.y * e2.x;
+        const uv = u.dot(v);
+        const cosuv = THREE.MathUtils.clamp(uv / (lu * lv), -1, 1);
+        const thetaDeg = Math.acos(cosuv) * 180 / Math.PI;
+        const ready = !parallel && Math.abs(dot) < 0.02;
+        const showRaw = mode === 'raw' || mode === 'e1' || mode === 'shadow';
+        const showE1 = mode !== 'raw' && !parallel || (mode !== 'raw' && mode !== 'frame' && mode !== 'e3');
+        const showUnit = mode === 'e1' || mode === 'shadow' || mode === 'frame' || mode === 'e3';
+        const showShadow = mode === 'shadow' && !parallel;
+        const showFrame = (mode === 'frame' || mode === 'e3') && ready;
+        const showLift = mode === 'e3' && ready;
+        activeCamera = showLift ? persp : ortho;
+        controls.enabled = showLift && !drag;
+
+        arrowMatrix(arrowU, u.x, u.y, 0, 0, 0.06);
+        arrowMatrix(arrowV, v.x, v.y, 0, 0, 0.06);
+        arrowU.visible = showRaw;
+        arrowV.visible = showRaw;
+        handleU.visible = showRaw;
+        handleV.visible = showRaw;
+        handleU.position.set(u.x, u.y, 0.16);
+        handleV.position.set(v.x, v.y, 0.16);
+
+        if (showUnit && !parallel) arrowMatrix(arrowE1, e1.x, e1.y, 0, 0, 0.09);
+        else arrowE1.visible = false;
+        if (showFrame) arrowMatrix(arrowE2, e2.x, e2.y, 0, 0, 0.09);
+        else arrowE2.visible = false;
+        arrowE1.material.color.setHex(showFrame ? SIGNAL : INK);
+        arrowE2.material.color.setHex(SIGNAL);
+
+        if (showShadow) arrowMatrix(arrowW, w.x, w.y, foot.x, foot.y, 0.07);
+        else arrowW.visible = false;
+
+        circle.visible = showUnit && !parallel;
+
+        if (showE1 && !parallel && (mode === 'e1' || mode === 'shadow')) {
+          writePoints(axis, [
+            e1.clone().multiplyScalar(-4.4),
+            e1.clone().multiplyScalar(4.4)
+          ], 0);
+          axis.visible = true;
+        } else {
+          axis.visible = false;
+        }
+
+        if (showShadow) {
+          writePoints(drop, [v, foot], 0.03);
+          drop.visible = true;
+          placeBar(shadowBar, new THREE.Vector2(0, 0), foot, 0.05, 0.04);
+          let nx = -e1.y;
+          let ny = e1.x;
+          if (w.x * nx + w.y * ny > 0) {
+            nx = -nx;
+            ny = -ny;
+          }
+          const off = 0.58;
+          const dim0 = new THREE.Vector2(nx * off, ny * off);
+          const dim1 = new THREE.Vector2(foot.x + nx * off, foot.y + ny * off);
+          const showDim = Math.abs(shadow) > 0.12;
+          if (showDim) {
+            placeBar(dimBar, dim0, dim1, 0.032, 0.05);
+            const along = e1.clone();
+            if (shadow < 0) along.negate();
+            placeHead(headFar, dim1, along);
+            placeHead(headNear, dim0, along.clone().negate());
+            const ext = extensions.geometry.getAttribute('position').array;
+            const pts = [new THREE.Vector2(0, 0), dim0, foot, dim1];
+            pts.forEach((p, i) => {
+              ext[i * 3] = p.x;
+              ext[i * 3 + 1] = p.y;
+              ext[i * 3 + 2] = 0.04;
+            });
+            extensions.geometry.getAttribute('position').needsUpdate = true;
+            extensions.visible = true;
+            showTag = true;
+            dimTag.textContent = fmt(shadow);
+            tagPoint.set((dim0.x + dim1.x) / 2 + nx * 0.28, (dim0.y + dim1.y) / 2 + ny * 0.28, 0);
+          } else {
+            dimBar.visible = false;
+            headNear.visible = false;
+            headFar.visible = false;
+            extensions.visible = false;
+            showTag = false;
+          }
+        } else {
+          drop.visible = false;
+          shadowBar.visible = false;
+          dimBar.visible = false;
+          headNear.visible = false;
+          headFar.visible = false;
+          extensions.visible = false;
+          showTag = false;
+        }
+
+        const angU = Math.atan2(u.y, u.x);
+        let delta = Math.atan2(v.y, v.x) - angU;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        if (mode === 'raw' && Math.abs(delta) > 0.05) {
+          const radius = Math.min(1.05, Math.min(lu, lv) * 0.45);
+          const count = 36;
+          const arr = arc.geometry.getAttribute('position').array;
+          for (let i = 0; i < count; i += 1) {
+            const t = angU + delta * (i / (count - 1));
+            arr[i * 3] = Math.cos(t) * radius;
+            arr[i * 3 + 1] = Math.sin(t) * radius;
+            arr[i * 3 + 2] = 0.04;
+          }
+          arc.geometry.getAttribute('position').needsUpdate = true;
+          arc.geometry.setDrawRange(0, count);
+          arc.visible = true;
+        } else {
+          arc.visible = false;
+        }
+
+        if (showFrame) {
+          const mark = 0.34;
+          const p1 = e1.clone().multiplyScalar(mark);
+          const p3 = e2.clone().multiplyScalar(mark);
+          const p2 = p1.clone().add(p3);
+          const arr = corner.geometry.getAttribute('position').array;
+          [p1, p2, p2, p3].forEach((p, i) => {
+            arr[i * 3] = p.x;
+            arr[i * 3 + 1] = p.y;
+            arr[i * 3 + 2] = 0.1;
+          });
+          corner.geometry.getAttribute('position').needsUpdate = true;
+          corner.visible = true;
+        } else {
+          corner.visible = false;
+        }
+
+        if (showLift) placeE3(e3z);
+        else {
+          shaftE3.visible = false;
+          headE3.visible = false;
+        }
+
+        const stampU = document.getElementById('stamp-u');
+        const stampV = document.getElementById('stamp-v');
+        const stampAngle = document.getElementById('stamp-angle');
+        if (showFrame) {
+          stampU.textContent = 'e1  ' + pair(e1.x, e1.y);
+          stampV.textContent = 'e2  ' + pair(e2.x, e2.y);
+          stampAngle.textContent = 'e1 · e2  ' + fmt(dot);
+          stampU.dataset.kind = 'point';
+          stampAngle.classList.add('is-zero');
+        } else {
+          stampU.textContent = 'Arrow u';
+          stampV.textContent = 'Arrow v';
+          stampAngle.textContent = 'θ ' + fmtDeg(thetaDeg) + '°';
+          stampU.dataset.kind = 'dir';
+          stampAngle.classList.remove('is-zero');
+        }
+
+        document.getElementById('u-out').textContent = pair(u.x, u.y);
+        document.getElementById('v-out').textContent = pair(v.x, v.y);
+        document.getElementById('e1-len').textContent = fmt(e1.length());
+        document.getElementById('e2-len').textContent = parallel ? '—' : fmt(e2.length());
+        document.getElementById('dot-out').textContent = parallel ? '—' : fmt(dot);
+        document.getElementById('shadow-out').textContent = fmt(shadow);
+        factors.textContent = [
+          'e1 = u / |u|',
+          'e2 = (v − shadow) / |remainder|',
+          line('|u|', fmt(lu)),
+          line('|e1|', fmt(1)),
+          line('|e2|', parallel ? '—' : fmt(1)),
+          line('e1 · e2', parallel ? '—' : fmt(dot)),
+          line('shadow', fmt(shadow)),
+          line('e1', pair(e1.x, e1.y)),
+          line('e2', parallel ? '—' : pair(e2.x, e2.y)),
+          line('e3', parallel ? '—' : '0.00,  0.00,  ' + fmt(e3z))
+        ].join('\n');
+
+        if (parallel && mode !== 'raw') {
+          blurb.textContent = 'u and v lie on one line. After the shadow is removed, nothing is left in a new direction, so this pair cannot make a frame.';
+        } else if (mode === 'raw') {
+          if (Math.abs(thetaDeg - 90) < 1.5) {
+            blurb.textContent = 'The angle is 90°. The arrows are perpendicular, and they are not both unit length yet. Press Orthonormal frame to give each direction length 1.';
+          } else {
+            blurb.textContent = 'These two arrows leave the same origin. The angle between them is ' + fmtDeg(thetaDeg) + '°. That is not a right angle, and their dot product is not zero, so they are not a frame yet.';
+          }
+        } else if (mode === 'e1') {
+          blurb.textContent = 'Keep the direction of u and divide by its length. e1 is a unit arrow along u. Its tip sits on the unit circle, so its length is 1.';
+        } else if (mode === 'shadow') {
+          if (Math.abs(shadow) < 0.08) {
+            blurb.textContent = 'The shadow of v on e1 has no length, because v is already perpendicular to e1. The pencil arrow is v itself. The next step divides it by its length.';
+          } else if (shadow < 0) {
+            blurb.textContent = 'The red measure is the shadow of v on e1. It falls backward, because the angle is greater than 90°. Subtract that shadow from v. The pencil arrow that remains is perpendicular to e1.';
+          } else {
+            blurb.textContent = 'The red measure is the shadow of v on e1. That shadow is (v · e1) e1. Subtract it from v. The pencil arrow that remains is perpendicular to e1.';
+          }
+        } else if (mode === 'frame') {
+          blurb.textContent = 'Divide the remainder by its length. e1 and e2 are both unit length, and their dot product is 0. They are red because the frame is orthonormal.';
+        } else {
+          blurb.textContent = 'e3 is the cross product e1 × e2. It stands perpendicular to the page. Curl the fingers of your right hand from e1 toward e2, and your thumb follows e3. Drag the empty paper to look around.';
+        }
+
+        buttons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.mode === mode));
+        });
+        render();
+      }
+
+      function activeCam() {
+        return mode === 'e3' ? persp : ortho;
+      }
+
+      function worldAt(event) {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, activeCam());
+        if (!raycaster.ray.intersectPlane(plane, hitPoint)) return null;
+        return hitPoint;
+      }
+
+      function pickHandle(event) {
+        const point = worldAt(event);
+        if (!point || !handleU.visible) return null;
+        const reach = narrowQuery.matches ? 0.7 : 0.48;
+        const du = Math.hypot(point.x - u.x, point.y - u.y);
+        const dv = Math.hypot(point.x - v.x, point.y - v.y);
+        if (du <= dv && du < reach) return u;
+        if (dv < reach) return v;
+        return null;
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        const target = pickHandle(event);
+        if (!target) return;
+        drag = target;
+        controls.enabled = false;
+        event.stopPropagation();
+        event.preventDefault();
+        canvas.setPointerCapture(event.pointerId);
+        canvas.style.cursor = 'grabbing';
+      }, true);
+      canvas.addEventListener('pointermove', (event) => {
+        const point = worldAt(event);
+        if (!point) return;
+        if (!drag) {
+          canvas.style.cursor = pickHandle(event) ? 'grab' : 'crosshair';
+          return;
+        }
+        drag.set(point.x, point.y);
+        clampTip(drag);
+        sync();
+      });
+      function endDrag() {
+        if (!drag) return;
+        drag = null;
+        controls.enabled = mode === 'e3';
+        canvas.style.cursor = 'crosshair';
+      }
+      canvas.addEventListener('pointerup', endDrag);
+      canvas.addEventListener('pointercancel', endDrag);
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          mode = button.dataset.mode;
+          if (mode === 'e3') {
+            controls.enabled = true;
+            ensureLoop();
+          } else {
+            controls.enabled = false;
+          }
+          sync();
+        });
+      });
+      document.getElementById('reset').addEventListener('click', () => {
+        u.copy(HOME_U);
+        v.copy(HOME_V);
+        persp.position.copy(HOME_POS);
+        controls.target.copy(HOME_TARGET);
+        controls.update();
+        sync();
+      });
+      controls.addEventListener('change', render);
+
+      function ensureLoop() {
+        if (reduceMotion || loopOn) return;
+        loopOn = true;
+        function loop() {
+          if (mode !== 'e3') {
+            loopOn = false;
+            return;
+          }
+          requestAnimationFrame(loop);
+          controls.update();
+          render();
+        }
+        loop();
+      }
+
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>
