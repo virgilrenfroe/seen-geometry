@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A house seen through a sheet. Move the eye. Perspective divides by w, and depth lines meet on the horizon.">
+  <title>Perspective — Seen Geometry</title>
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">10 · Perspective</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="An eye, a sheet, and a house. Rays meet the sheet. Depth lines run to a vanishing point on the horizon."></canvas>
+    <div class="stamps">
+      <p data-kind="point" id="stamp-angle">Angle —</p>
+      <p data-kind="dir">Horizon at the eye</p>
+    </div>
+  </div>
+  <section class="dock" aria-label="Perspective">
+    <p class="index-no">10</p>
+    <h1>Divide by w</h1>
+    <p class="lede">The eye sits in front of a sheet. The house stands behind the sheet. Slide the eye closer or farther. Where a ray meets the sheet, that point is the drawing.</p>
+    <p id="blurb">Parallel edges that run away from you meet at one vanishing point. The vanishing point sits on the horizon, level with the eye. The matrix stays the same when the eye moves. This corner's depth changes, and that changes w.</p>
+    <label class="field">
+      <span>Eye distance <output id="dist-out">4.20</output></span>
+      <input id="dist" type="range" min="2.4" max="7.5" step="0.01" value="4.2">
+    </label>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch"></span><span>Before</span><span id="before-out">—</span></li>
+      <li><span class="swatch navy"></span><span>w</span><span id="w-out">—</span></li>
+      <li><span class="swatch clay"></span><span>After</span><span id="after-out">—</span></li>
+    </ul>
+    <p class="fine">The matrix writes depth into w. Then x, y, and z are divided by w. A far corner has a larger w, so it shrinks more. In <a href="04-point-vs-direction.html">lesson 04</a>, w marks a point or a direction. Here, w carries depth.</p>
+    <table class="matrix measure" id="matrix">
+      <caption>4×4 perspective matrix. It multiplies the corner measured from the eye. Read each row from left to right. The bottom row builds w.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <button type="button" class="quiet" id="reset">Reset view</button>
+    </div>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>A 3D camera in a game or an animated film uses this divide. A graphics programmer builds that camera. A layout artist or a camera artist places it.</li>
+        <li>Artists and illustrators draw lines to a vanishing point on a horizon. This is linear perspective. Painters have used it since the Renaissance.</li>
+        <li>On a phone, augmented reality uses the same divide, so a virtual object lines up with the camera.</li>
+        <li>In computer vision, a related idea is the pinhole camera. A photogrammetrist uses it to measure a real object from photographs. A real lens can add distortion, which this page leaves out.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="09-projection.html">Projection</a> · <a href="../index.html">Lessons</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html">09 Projection</a>
+      <a href="10-perspective.html" aria-current="page">10 Perspective</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const distInput = document.getElementById('dist');
+    const factors = document.getElementById('factors');
+    const matrixTable = document.getElementById('matrix');
+
+    const INK = 0x1a1f1a;
+    const PENCIL = 0x5c665c;
+    const SIGNAL = 0xd01212;
+    const PAPER = 0xe7efe4;
+    const EYE_H = 1.2;
+    const FOCAL = 2;
+    const FRONT_Z = 3.35;
+    const MARK = 5;
+
+    const LOCAL = [
+      [-0.7, 0, -0.55],
+      [0.7, 0, -0.55],
+      [0.7, 0, 0.55],
+      [-0.7, 0, 0.55],
+      [-0.7, 0.85, -0.55],
+      [0.7, 0.85, -0.55],
+      [0.7, 0.85, 0.55],
+      [-0.7, 0.85, 0.55],
+      [0, 1.3, -0.55],
+      [0, 1.3, 0.55]
+    ].map((p) => new THREE.Vector3(p[0], p[1], p[2] + FRONT_Z + 0.55));
+
+    const EDGES = [
+      [0, 1], [1, 2], [2, 3], [3, 0],
+      [0, 4], [1, 5], [2, 6], [3, 7],
+      [4, 5], [5, 6], [6, 7], [7, 4],
+      [4, 8], [8, 5], [7, 9], [9, 6], [8, 9]
+    ];
+    const DEPTH = [[0, 3], [1, 2], [4, 7], [5, 6], [8, 9]];
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function makeLines(color, count, dashed) {
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 6), 3));
+      const material = dashed
+        ? new THREE.LineDashedMaterial({ color, dashSize: 0.1, gapSize: 0.07 })
+        : new THREE.LineBasicMaterial({ color });
+      const line = new THREE.LineSegments(geometry, material);
+      line.frustumCulled = false;
+      return line;
+    }
+
+    function writePairs(line, pairs, points) {
+      const attr = line.geometry.getAttribute('position');
+      const arr = attr.array;
+      let offset = 0;
+      pairs.forEach(([a, b]) => {
+        const pa = points[a];
+        const pb = points[b];
+        arr[offset++] = pa.x; arr[offset++] = pa.y; arr[offset++] = pa.z;
+        arr[offset++] = pb.x; arr[offset++] = pb.y; arr[offset++] = pb.z;
+      });
+      attr.needsUpdate = true;
+      if (line.computeLineDistances) line.computeLineDistances();
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.08, 50);
+      camera.position.set(5.1, 2.55, 0.35);
+
+      const ground = new THREE.GridHelper(14, 14, INK, 0xb7c0b4);
+      ground.position.y = 0;
+      scene.add(ground);
+
+      const house = makeLines(INK, EDGES.length, false);
+      const rays = makeLines(PENCIL, LOCAL.length, false);
+      const drawing = makeLines(SIGNAL, EDGES.length, false);
+      const guides = makeLines(PENCIL, DEPTH.length, true);
+      scene.add(rays, house, drawing, guides);
+
+      const sheet = new THREE.LineSegments(
+        new THREE.BufferGeometry(),
+        new THREE.LineBasicMaterial({ color: 0xb7c0b4 })
+      );
+      sheet.frustumCulled = false;
+      scene.add(sheet);
+
+      const horizon = new THREE.Mesh(
+        new THREE.BoxGeometry(3.6, 0.018, 0.018),
+        new THREE.MeshBasicMaterial({ color: INK })
+      );
+      const vp = new THREE.Mesh(
+        new THREE.SphereGeometry(0.07, 18, 12),
+        new THREE.MeshBasicMaterial({ color: SIGNAL })
+      );
+      const eyeDot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.08, 18, 12),
+        new THREE.MeshBasicMaterial({ color: SIGNAL })
+      );
+      const cornerDot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.065, 16, 12),
+        new THREE.MeshBasicMaterial({ color: SIGNAL })
+      );
+      scene.add(horizon, vp, eyeDot, cornerDot);
+
+      const eyeDrop = makeLines(PENCIL, 1, false);
+      const arcGeom = new THREE.BufferGeometry();
+      arcGeom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(33 * 3), 3));
+      const arc = new THREE.Line(arcGeom, new THREE.LineBasicMaterial({ color: SIGNAL }));
+      arc.frustumCulled = false;
+      scene.add(eyeDrop, arc);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = !reduceMotion;
+      controls.dampingFactor = 0.08;
+      controls.target.set(0, 1.05, 2.1);
+      controls.minDistance = 2.4;
+      controls.maxDistance = 16;
+      controls.maxPolarAngle = Math.PI * 0.49;
+      controls.update();
+      const homePosition = camera.position.clone();
+      const homeTarget = controls.target.clone();
+
+      const eye = new THREE.Vector3();
+      const projected = LOCAL.map(() => new THREE.Vector3());
+      const sheetPoints = [];
+      const halfW = 1.8;
+      const top = 2.55;
+      for (let x = -halfW; x <= halfW + 0.001; x += 0.45) {
+        sheetPoints.push(x, 0, 0, x, top, 0);
+      }
+      for (let y = 0; y <= top + 0.001; y += 0.45) {
+        sheetPoints.push(-halfW, y, 0, halfW, y, 0);
+      }
+      sheetPoints.push(-halfW, top, 0, halfW, top, 0);
+      sheet.geometry.setAttribute('position', new THREE.Float32BufferAttribute(sheetPoints, 3));
+      sheet.geometry.attributes.position.setUsage(THREE.DynamicDrawUsage);
+
+      function hitOnSheet(point) {
+        const xe = point.x - eye.x;
+        const ye = point.y - eye.y;
+        const ze = point.z - eye.z;
+        const t = FOCAL / ze;
+        return new THREE.Vector3(eye.x + xe * t, eye.y + ye * t, eye.z + FOCAL);
+      }
+
+      function fillMatrix() {
+        const body = matrixTable.tBodies[0];
+        const inv = 1 / FOCAL;
+        const values = [
+          1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1, 0,
+          0, 0, inv, 0
+        ];
+        for (let i = 0; i < 16; i += 1) {
+          const cell = body.rows[Math.floor(i / 4)].cells[i % 4];
+          cell.textContent = fmt(values[i]);
+          cell.classList.toggle('is-hot', Math.floor(i / 4) === 3);
+        }
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function sync() {
+        frame();
+        const distance = Number(distInput.value);
+        eye.set(0, EYE_H, FRONT_Z - distance);
+        const planeZ = eye.z + FOCAL;
+
+        LOCAL.forEach((point, index) => {
+          projected[index].copy(hitOnSheet(point));
+          projected[index].z = planeZ + 0.02;
+        });
+        const drawPts = projected.map((point) => point);
+        writePairs(house, EDGES, LOCAL);
+        writePairs(drawing, EDGES, drawPts);
+
+        const rayAttr = rays.geometry.getAttribute('position');
+        const rayArr = rayAttr.array;
+        let rayOffset = 0;
+        LOCAL.forEach((point) => {
+          rayArr[rayOffset++] = eye.x; rayArr[rayOffset++] = eye.y; rayArr[rayOffset++] = eye.z;
+          rayArr[rayOffset++] = point.x; rayArr[rayOffset++] = point.y; rayArr[rayOffset++] = point.z;
+        });
+        rayAttr.needsUpdate = true;
+
+        const vpPoint = new THREE.Vector3(0, EYE_H, planeZ + 0.03);
+        const guidePoints = DEPTH.map(([a, b]) => {
+          const near = LOCAL[a].z <= LOCAL[b].z ? projected[a] : projected[b];
+          return [vpPoint, near];
+        });
+        const guideAttr = guides.geometry.getAttribute('position');
+        const guideArr = guideAttr.array;
+        let guideOffset = 0;
+        guidePoints.forEach(([a, b]) => {
+          guideArr[guideOffset++] = a.x; guideArr[guideOffset++] = a.y; guideArr[guideOffset++] = a.z;
+          guideArr[guideOffset++] = b.x; guideArr[guideOffset++] = b.y; guideArr[guideOffset++] = b.z;
+        });
+        guideAttr.needsUpdate = true;
+        guides.computeLineDistances();
+
+        const sheetAttr = sheet.geometry.getAttribute('position');
+        const sheetArr = sheetAttr.array;
+        for (let i = 2; i < sheetArr.length; i += 3) sheetArr[i] = planeZ;
+        sheetAttr.needsUpdate = true;
+
+        horizon.position.set(0, EYE_H, planeZ + 0.02);
+        vp.position.copy(vpPoint);
+        eyeDot.position.copy(eye);
+        cornerDot.position.copy(projected[MARK]);
+
+        const dropAttr = eyeDrop.geometry.getAttribute('position');
+        dropAttr.array.set([eye.x, 0, eye.z, eye.x, eye.y, eye.z]);
+        dropAttr.needsUpdate = true;
+
+        const roof = new THREE.Vector3(0, 1.3, FRONT_Z);
+        const foot = new THREE.Vector3(0, 0, FRONT_Z);
+        const va = roof.clone().sub(eye).normalize();
+        const vb = foot.clone().sub(eye).normalize();
+        const angle = va.angleTo(vb);
+        const axis = new THREE.Vector3().crossVectors(va, vb);
+        if (axis.lengthSq() > 1e-8) axis.normalize();
+        const arcAttr = arc.geometry.getAttribute('position');
+        const arcArr = arcAttr.array;
+        const steps = 32;
+        for (let i = 0; i <= steps; i += 1) {
+          const q = new THREE.Quaternion().setFromAxisAngle(axis, angle * (i / steps));
+          const p = va.clone().applyQuaternion(q).multiplyScalar(0.72).add(eye);
+          arcArr[i * 3] = p.x;
+          arcArr[i * 3 + 1] = p.y;
+          arcArr[i * 3 + 2] = p.z;
+        }
+        arcAttr.needsUpdate = true;
+
+        const marked = LOCAL[MARK];
+        const xe = marked.x - eye.x;
+        const ye = marked.y - eye.y;
+        const ze = marked.z - eye.z;
+        const w = ze / FOCAL;
+        const degrees = angle * 180 / Math.PI;
+        document.getElementById('dist-out').textContent = distance.toFixed(2);
+        document.getElementById('stamp-angle').textContent = 'Angle ' + degrees.toFixed(0) + '°';
+        factors.textContent =
+          'distance  ' + distance.toFixed(2) + '\n' +
+          'angle     ' + degrees.toFixed(0) + '°\n' +
+          'w = z / ' + FOCAL.toFixed(2);
+        document.getElementById('before-out').textContent = fmt(xe) + ',  ' + fmt(ye) + ',  ' + fmt(ze) + ',  1';
+        document.getElementById('w-out').textContent = fmt(w);
+        document.getElementById('after-out').textContent = fmt(xe / w) + ',  ' + fmt(ye / w) + ',  ' + fmt(FOCAL);
+        fillMatrix();
+      }
+
+      distInput.addEventListener('input', sync);
+      document.getElementById('reset').addEventListener('click', () => {
+        camera.position.copy(homePosition);
+        controls.target.copy(homeTarget);
+        controls.update();
+        sync();
+      });
+
+      new ResizeObserver(sync).observe(stage);
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+
+      function loop() {
+        requestAnimationFrame(loop);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      loop();
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>

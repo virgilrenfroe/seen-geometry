@@ -19,6 +19,8 @@ An educator directed AI agents to build these pages. The author is not a softwar
 | [06 Determinant and reflection](demos/06-determinant.html) | Drag i and j. The area of the image is \|det\|. A negative determinant mirrors the F. Zero flattens it onto a line. |
 | [07 Fold](demos/07-fold.html) | Drag a crease. One half folds over the line. The reflection has determinant −1, so the mark flips. An offset line is a slide, a reflection, and a slide back. |
 | [08 Rotation](demos/08-rotation.html) | Drag a point on the unit circle. The rotation matrix has determinant 1. Two folds make that turn: twice the angle between the creases. |
+| [09 Projection](demos/09-projection.html) | A house drops onto a plane. Switch among top, front, and side. One row of the matrix is zeros and the determinant stays 0. Tilt the plane and the determinant stays 0. |
+| [10 Perspective](demos/10-perspective.html) | Move the eye closer or farther. Read one corner before the divide by w and after it. Depth lines meet at a vanishing point on the horizon. |
 
 Each lesson has a short note, “Where this is used.” It names fields and jobs where the idea appears.
 
@@ -34,6 +36,8 @@ A useful order for a class:
 6. In demo 06, press Reflect across Y. The determinant turns negative and the F reads backwards. Press Squash to a line. The determinant becomes 0 and the F lies on that line.
 7. In demo 07, watch the sheet fold. The determinant stays −1, so the mark flips. Then move the crease off the origin and read the three-step product.
 8. In demo 08, drag the point around the circle. The determinant stays 1. Turn on two folds. The turn is twice the angle between the creases.
+9. In demo 09, switch among Top, Front, and Side. One row of the matrix is zeros and the determinant stays 0. Then tilt the plane. The determinant stays 0.
+10. In demo 10, move the eye closer and farther. Read one corner before the divide and after it. A larger w makes a smaller image on the sheet.
 
 ## Run locally
 
@@ -68,4 +72,4 @@ Type is [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotes
 
 ## Design
 
-The pages are a drafting plate. The ground is graph paper. Titles, arcs, and dimension marks sit on that grid in ink, with one red for the measure. The hub is one plate of eight lessons. A crease is a construction line. The unit circle is a compass arc.
+The pages are a drafting plate. The ground is graph paper. Titles, arcs, and dimension marks sit on that grid in ink, with one red for the measure. The hub is one plate of ten lessons. A crease is a construction line. The unit circle is a compass arc.

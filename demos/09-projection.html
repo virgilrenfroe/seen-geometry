@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projection — Seen Geometry</title>
+  <meta name="description" content="A house drops onto a plane. Top, front, and side views. The projection matrix has determinant 0.">
+  <meta name="theme-color" content="#e7efe4">
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,560;12..96,680&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/studio.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body class="demo">
+  <header class="top">
+    <a class="brand" href="../index.html">Seen Geometry</a>
+    <p class="eyebrow">09 · Projection</p>
+  </header>
+  <div class="stage" id="stage">
+    <canvas id="canvas" aria-label="A wire house above a plane. Lines drop from each corner. The red drawing is the flat view."></canvas>
+    <div class="stamps">
+      <p data-kind="point" id="stamp-view">Plan</p>
+      <p data-kind="dir" id="stamp-det">det = 0</p>
+    </div>
+  </div>
+  <section class="dock" aria-label="Projection">
+    <p class="index-no">09</p>
+    <h1>Flatten onto a plane</h1>
+    <p class="lede">Lines drop from each corner of the house onto the plane. The red drawing is the flat view. It keeps two directions and loses the third.</p>
+    <div class="orders" role="group" aria-label="View">
+      <button type="button" data-view="top" aria-pressed="true">Top</button>
+      <button type="button" data-view="front" aria-pressed="false">Front</button>
+      <button type="button" data-view="side" aria-pressed="false">Side</button>
+    </div>
+    <p id="blurb">This is the plan, the top view. Height is gone.</p>
+    <label class="field">
+      <span>Tilt <output id="tilt-out">0°</output></span>
+      <input id="tilt" type="range" min="-40" max="40" step="1" value="0">
+    </label>
+    <pre class="factors" id="factors"></pre>
+    <ul class="tails">
+      <li><span class="swatch"></span><span>Corner</span><span id="corner-out">—</span></li>
+      <li><span class="swatch clay"></span><span>On plane</span><span id="flat-out">—</span></li>
+      <li><span class="swatch navy"></span><span>det</span><span id="det-out">0.00</span></li>
+    </ul>
+    <p class="fine" id="fine">A zero row is the direction that was dropped. The determinant is 0, so you cannot undo this flatten. <a href="06-determinant.html">Lesson 06</a> shows the same squash. The lost direction does not come back.</p>
+    <table class="matrix measure" id="matrix">
+      <caption>3×3 projection. Read each row from left to right. A zero row drops one direction.</caption>
+      <tbody>
+        <tr><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td></tr>
+        <tr><td>—</td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <button type="button" class="quiet" id="reset">Reset view</button>
+    </div>
+    <details class="used">
+      <summary>Where this is used</summary>
+      <ul>
+        <li>Architects and architectural drafters draw a plan and elevations. The plan is the top view. An elevation is the front or the side. Each view drops one direction.</li>
+        <li>Mechanical drafters and CAD designers do the same for a part. The front, top, and side views sit together on one sheet.</li>
+        <li>In games, a related idea is a shadow map. A light flattens the scene onto a plane to draw a shadow. That map is not an architectural plan.</li>
+        <li>In cartography, a related idea is a map projection. A cartographer flattens the Earth onto a sheet. Information is lost, but the matrix is not this one.</li>
+      </ul>
+    </details>
+    <script>
+      if (window.matchMedia("(min-width: 900px)").matches) {
+        document.currentScript.previousElementSibling.open = true;
+      }
+    </script>
+    <p class="next"><a href="08-rotation.html">Rotation</a> · <a href="10-perspective.html">Next: perspective</a></p>
+  </section>
+  <nav class="reelbar" aria-label="Lessons">
+    <div class="reelbar-track">
+      <a href="01-instanced-field.html">01 Instanced field</a>
+      <a href="02-morph-targets.html">02 Morph targets</a>
+      <a href="03-compose-transforms.html">03 Order of transforms</a>
+      <a href="04-point-vs-direction.html">04 Point vs direction</a>
+      <a href="05-shear.html">05 Shear</a>
+      <a href="06-determinant.html">06 Determinant</a>
+      <a href="07-fold.html">07 Fold</a>
+      <a href="08-rotation.html">08 Rotation</a>
+      <a href="09-projection.html" aria-current="page">09 Projection</a>
+      <a href="10-perspective.html">10 Perspective</a>
+      <a href="../index.html">Lessons</a>
+      <a class="reel-clone" href="01-instanced-field.html" tabindex="-1" aria-hidden="true">01 Instanced field</a>
+      <a class="reel-clone" href="02-morph-targets.html" tabindex="-1" aria-hidden="true">02 Morph targets</a>
+      <a class="reel-clone" href="03-compose-transforms.html" tabindex="-1" aria-hidden="true">03 Order of transforms</a>
+      <a class="reel-clone" href="04-point-vs-direction.html" tabindex="-1" aria-hidden="true">04 Point vs direction</a>
+      <a class="reel-clone" href="05-shear.html" tabindex="-1" aria-hidden="true">05 Shear</a>
+      <a class="reel-clone" href="06-determinant.html" tabindex="-1" aria-hidden="true">06 Determinant</a>
+      <a class="reel-clone" href="07-fold.html" tabindex="-1" aria-hidden="true">07 Fold</a>
+      <a class="reel-clone" href="08-rotation.html" tabindex="-1" aria-hidden="true">08 Rotation</a>
+      <a class="reel-clone" href="09-projection.html" tabindex="-1" aria-hidden="true">09 Projection</a>
+      <a class="reel-clone" href="10-perspective.html" tabindex="-1" aria-hidden="true">10 Perspective</a>
+      <a class="reel-clone" href="../index.html" tabindex="-1" aria-hidden="true">Lessons</a>
+    </div>
+  </nav>
+  <p class="status" id="status">Loading the picture…</p>
+  <script>
+    window.setTimeout(function () {
+      var node = document.getElementById('status');
+      if (!node || node.dataset.ready === '1') return;
+      node.hidden = false;
+      node.textContent = 'The picture did not start. Check your connection, then reload the page.';
+    }, 12000);
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const status = document.getElementById('status');
+    const stage = document.getElementById('stage');
+    const canvas = document.getElementById('canvas');
+    const tiltInput = document.getElementById('tilt');
+    const blurb = document.getElementById('blurb');
+    const fine = document.getElementById('fine');
+    const factors = document.getElementById('factors');
+    const matrixTable = document.getElementById('matrix');
+    const buttons = Array.from(document.querySelectorAll('.orders button'));
+
+    const INK = 0x1a1f1a;
+    const PENCIL = 0x5c665c;
+    const SIGNAL = 0xd01212;
+    const MINOR = 0xb7c0b4;
+    const PAPER = 0xe7efe4;
+    const MARK = 5;
+    const GAP = 1.25;
+
+    const LOCAL = [
+      [-0.7, 0, -0.55],
+      [0.7, 0, -0.55],
+      [0.7, 0, 0.55],
+      [-0.7, 0, 0.55],
+      [-0.7, 0.85, -0.55],
+      [0.7, 0.85, -0.55],
+      [0.7, 0.85, 0.55],
+      [-0.7, 0.85, 0.55],
+      [0, 1.3, -0.55],
+      [0, 1.3, 0.55]
+    ].map((p) => new THREE.Vector3(p[0], p[1], p[2]));
+
+    const EDGES = [
+      [0, 1], [1, 2], [2, 3], [3, 0],
+      [0, 4], [1, 5], [2, 6], [3, 7],
+      [4, 5], [5, 6], [6, 7], [7, 4],
+      [4, 8], [8, 5], [7, 9], [9, 6], [8, 9]
+    ];
+
+    const COPY = {
+      top: {
+        name: 'Plan',
+        lost: 'height',
+        blurb: 'This is the plan, the top view. Height is gone.',
+        camera: [3.35, 2.55, 3.55]
+      },
+      front: {
+        name: 'Front elevation',
+        lost: 'depth',
+        blurb: 'This is the front elevation. Depth is gone.',
+        camera: [3.6, 1.7, 2.55]
+      },
+      side: {
+        name: 'Side elevation',
+        lost: 'width',
+        blurb: 'This is the side elevation. Width is gone.',
+        camera: [2.7, 1.75, 3.7]
+      }
+    };
+
+    let view = 'top';
+
+    function fail(message) {
+      status.hidden = false;
+      status.dataset.ready = '1';
+      status.textContent = message;
+    }
+
+    function fmt(n) {
+      if (!Number.isFinite(n) || Math.abs(n) < 0.005) return '0.00';
+      const text = n.toFixed(2);
+      return text === '-0.00' ? '0.00' : text;
+    }
+
+    function fmt3(v) {
+      return fmt(v.x) + ',  ' + fmt(v.y) + ',  ' + fmt(v.z);
+    }
+
+    function det3(m) {
+      return m[0] * (m[4] * m[8] - m[5] * m[7])
+        - m[1] * (m[3] * m[8] - m[5] * m[6])
+        + m[2] * (m[3] * m[7] - m[4] * m[6]);
+    }
+
+    function normalFor(which, degrees) {
+      const t = degrees * Math.PI / 180;
+      const c = Math.cos(t);
+      const s = Math.sin(t);
+      if (which === 'top') return new THREE.Vector3(0, c, s);
+      if (which === 'front') return new THREE.Vector3(0, s, c);
+      return new THREE.Vector3(c, s, 0);
+    }
+
+    function projectionOf(n) {
+      return [
+        1 - n.x * n.x, -n.x * n.y, -n.x * n.z,
+        -n.y * n.x, 1 - n.y * n.y, -n.y * n.z,
+        -n.z * n.x, -n.z * n.y, 1 - n.z * n.z
+      ];
+    }
+
+    function makeLines(color, count, dashed) {
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(count * 6), 3));
+      const material = dashed
+        ? new THREE.LineDashedMaterial({ color, dashSize: 0.09, gapSize: 0.07 })
+        : new THREE.LineBasicMaterial({ color });
+      const line = new THREE.LineSegments(geometry, material);
+      line.frustumCulled = false;
+      return line;
+    }
+
+    function writeLines(line, pairs, points) {
+      const attr = line.geometry.getAttribute('position');
+      const arr = attr.array;
+      let offset = 0;
+      pairs.forEach(([a, b]) => {
+        const pa = points[a];
+        const pb = points[b];
+        arr[offset++] = pa.x; arr[offset++] = pa.y; arr[offset++] = pa.z;
+        arr[offset++] = pb.x; arr[offset++] = pb.y; arr[offset++] = pb.z;
+      });
+      attr.needsUpdate = true;
+      if (line.computeLineDistances) line.computeLineDistances();
+    }
+
+    function boot() {
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NoToneMapping;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(PAPER);
+      const camera = new THREE.PerspectiveCamera(42, 1, 0.08, 40);
+
+      const minorIdx = [];
+      const majorIdx = [];
+      for (let i = -6; i <= 6; i += 1) {
+        (i % 2 === 0 ? majorIdx : minorIdx).push(i);
+      }
+      const minorGrid = makeLines(MINOR, minorIdx.length * 2, false);
+      const majorGrid = makeLines(INK, majorIdx.length * 2, false);
+      const house = makeLines(INK, EDGES.length, false);
+      const projectors = makeLines(PENCIL, LOCAL.length, false);
+      const shadow = makeLines(SIGNAL, EDGES.length, false);
+      scene.add(minorGrid, majorGrid, projectors, house, shadow);
+
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.075, 18, 12),
+        new THREE.MeshBasicMaterial({ color: SIGNAL })
+      );
+      const flatDot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.07, 18, 12),
+        new THREE.MeshBasicMaterial({ color: SIGNAL })
+      );
+      scene.add(dot, flatDot);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = !reduceMotion;
+      controls.dampingFactor = 0.08;
+      controls.minDistance = 2.2;
+      controls.maxDistance = 14;
+      controls.maxPolarAngle = Math.PI - 0.08;
+      controls.target.set(0, 0.7, 0);
+      controls.update();
+
+      const n = new THREE.Vector3();
+      const u = new THREE.Vector3();
+      const v = new THREE.Vector3();
+      const world = LOCAL.map(() => new THREE.Vector3());
+      const image = LOCAL.map(() => new THREE.Vector3());
+      const flat = LOCAL.map(() => new THREE.Vector3());
+
+      function basis(normal) {
+        const helper = Math.abs(normal.y) < 0.85 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+        u.crossVectors(helper, normal).normalize();
+        v.crossVectors(normal, u).normalize();
+      }
+
+      function writeGrid(line, steps) {
+        const attr = line.geometry.getAttribute('position');
+        const arr = attr.array;
+        let offset = 0;
+        const reach = 3;
+        steps.forEach((step) => {
+          const t = step * 0.5;
+          const a = u.clone().multiplyScalar(-reach).addScaledVector(v, t);
+          const b = u.clone().multiplyScalar(reach).addScaledVector(v, t);
+          const c = v.clone().multiplyScalar(-reach).addScaledVector(u, t);
+          const d = v.clone().multiplyScalar(reach).addScaledVector(u, t);
+          arr[offset++] = a.x; arr[offset++] = a.y; arr[offset++] = a.z;
+          arr[offset++] = b.x; arr[offset++] = b.y; arr[offset++] = b.z;
+          arr[offset++] = c.x; arr[offset++] = c.y; arr[offset++] = c.z;
+          arr[offset++] = d.x; arr[offset++] = d.y; arr[offset++] = d.z;
+        });
+        attr.needsUpdate = true;
+      }
+
+      function placeCamera() {
+        const spot = COPY[view].camera;
+        camera.position.set(spot[0], spot[1], spot[2]);
+        controls.target.set(n.x * 0.85, n.y * 0.85, n.z * 0.85);
+        controls.update();
+      }
+
+      function fillMatrix(m, hotRow) {
+        const body = matrixTable.tBodies[0];
+        for (let r = 0; r < 3; r += 1) {
+          for (let c = 0; c < 3; c += 1) {
+            const cell = body.rows[r].cells[c];
+            cell.textContent = fmt(m[r * 3 + c]);
+            cell.classList.toggle('is-hot', r === hotRow);
+          }
+        }
+      }
+
+      function frame() {
+        const width = stage.clientWidth;
+        const height = stage.clientHeight;
+        if (width < 2 || height < 2) return;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setSize(width, height, false);
+      }
+
+      function sync() {
+        frame();
+        const tilt = Number(tiltInput.value);
+        n.copy(normalFor(view, tilt)).normalize();
+        basis(n);
+        let minDot = Infinity;
+        LOCAL.forEach((point) => {
+          minDot = Math.min(minDot, point.dot(n));
+        });
+        const lift = GAP - minDot;
+        LOCAL.forEach((point, index) => {
+          world[index].copy(point).addScaledVector(n, lift);
+          const along = world[index].dot(n);
+          image[index].copy(world[index]).addScaledVector(n, -along);
+          flat[index].copy(image[index]).addScaledVector(n, 0.025);
+        });
+
+        writeGrid(minorGrid, minorIdx);
+        writeGrid(majorGrid, majorIdx);
+        writeLines(house, EDGES, world);
+        writeLines(shadow, EDGES, flat);
+        const attr = projectors.geometry.getAttribute('position');
+        const arr = attr.array;
+        let offset = 0;
+        world.forEach((point, index) => {
+          const pb = flat[index];
+          arr[offset++] = point.x; arr[offset++] = point.y; arr[offset++] = point.z;
+          arr[offset++] = pb.x; arr[offset++] = pb.y; arr[offset++] = pb.z;
+        });
+        attr.needsUpdate = true;
+
+        dot.position.copy(world[MARK]);
+        flatDot.position.copy(flat[MARK]);
+
+        const matrix = projectionOf(n);
+        const det = det3(matrix);
+        let hotRow = -1;
+        for (let r = 0; r < 3; r += 1) {
+          const rowClear = [0, 1, 2].every((c) => Math.abs(matrix[r * 3 + c]) < 0.005);
+          if (rowClear) hotRow = r;
+        }
+        fillMatrix(matrix, hotRow);
+
+        const tilted = Math.abs(tilt) > 0;
+        const copy = COPY[view];
+        document.getElementById('stamp-view').textContent = tilted ? 'Tilted plane' : copy.name;
+        document.getElementById('stamp-det').textContent = 'det = 0';
+        document.getElementById('tilt-out').textContent = tilt + '°';
+        blurb.textContent = tilted
+          ? 'The plane is tilted. The flat view still loses one direction. The determinant stays 0.'
+          : copy.blurb;
+        fine.innerHTML = hotRow >= 0
+          ? 'A zero row is the direction that was dropped. The determinant is 0, so you cannot undo this flatten. <a href="06-determinant.html">Lesson 06</a> shows the same squash. The lost direction does not come back.'
+          : 'No row is all zeros, because the plane is tilted. The determinant is still 0, so you cannot undo this flatten. <a href="06-determinant.html">Lesson 06</a> shows the same squash.';
+        factors.textContent =
+          'lost   ' + (tilted ? 'one direction' : copy.lost) + '\n' +
+          'det    ' + fmt(det);
+        document.getElementById('corner-out').textContent = fmt3(world[MARK]);
+        document.getElementById('flat-out').textContent = fmt3(image[MARK]);
+        document.getElementById('det-out').textContent = fmt(det);
+        buttons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.view === view));
+        });
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener('click', () => {
+          view = button.dataset.view;
+          tiltInput.value = '0';
+          n.copy(normalFor(view, 0));
+          placeCamera();
+          sync();
+        });
+      });
+      tiltInput.addEventListener('input', sync);
+      document.getElementById('reset').addEventListener('click', () => {
+        n.copy(normalFor(view, Number(tiltInput.value)));
+        placeCamera();
+        sync();
+      });
+
+      new ResizeObserver(sync).observe(stage);
+      n.copy(normalFor(view, 0));
+      placeCamera();
+      sync();
+      status.dataset.ready = '1';
+      status.hidden = true;
+
+      function loop() {
+        requestAnimationFrame(loop);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      loop();
+    }
+
+    try {
+      boot();
+    } catch (error) {
+      console.error(error);
+      fail('The picture did not start in this browser.');
+    }
+  </script>
+</body>
+</html>

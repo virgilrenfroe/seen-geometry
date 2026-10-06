@@ -393,6 +393,8 @@ input[type="number"] {
 }
 .matrix td { padding: 0.16rem 0.4rem; text-align: right; }
 .matrix td:last-child { color: var(--signal); font-weight: 700; }
+.matrix.measure td:last-child { color: inherit; font-weight: 400; }
+.matrix td.is-hot { color: var(--signal); font-weight: 700; }
 .fine { color: var(--mute); font-size: 0.95rem; }
 .used {
   margin: 0.85rem 0 0.15rem;
