@@ -26,8 +26,8 @@
       <input id="ang" type="range" min="0" max="180" value="28">
     </label>
     <label class="tab">
-      <span>Fold</span> <b id="fdeg">58°</b>
-      <input id="fold" type="range" min="0" max="180" value="58">
+      <span>Fold</span> <b id="fdeg">112°</b>
+      <input id="fold" type="range" min="0" max="180" value="112">
     </label>
     <aside class="scrap">
       <p class="eye">det = −1</p>
@@ -154,33 +154,49 @@
 
         var base = [[-W, -H], [W, -H], [W, H], [-W, H]];
         ctx.save();
-        ctx.translate(7, 10);
+        ctx.translate(8, 12);
         trace(ctx, base);
-        ctx.fillStyle = "#c5daf0";
+        ctx.fillStyle = "#b9d4ea";
         ctx.fill();
         ctx.restore();
 
         var still = half(false);
-        var moving = half(true).map(foldPoint);
+        var openMoving = half(true);
+        var moving = openMoving.map(foldPoint);
         var cos = Math.cos(fold);
         trace(ctx, still);
         ctx.fillStyle = "#fffdf8";
         ctx.fill();
-        var light = ctx.createLinearGradient(0, 0, 0, h * 0.7);
-        light.addColorStop(0, "rgba(255,255,255,0.55)");
+        var light = ctx.createLinearGradient(0, 0, 0, h * 0.62);
+        light.addColorStop(0, "rgba(255,255,255,0.7)");
         light.addColorStop(1, "rgba(255,255,255,0)");
         trace(ctx, still);
         ctx.fillStyle = light;
         ctx.fill();
 
+        ctx.save();
+        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 1.25;
+        ctx.strokeStyle = "rgba(27,36,48,0.28)";
+        trace(ctx, openMoving);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(0, 10);
         trace(ctx, moving);
-        ctx.fillStyle = cos < 0 ? "#d5e7f4" : "rgba(255,253,248,0.96)";
+        ctx.fillStyle = "rgba(30,50,70,0.14)";
         ctx.fill();
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "#b7d0e6";
+        ctx.restore();
+
+        trace(ctx, moving);
+        ctx.fillStyle = cos < 0.15 ? "#d5e7f4" : "#fffdf8";
+        ctx.fill();
+        ctx.lineWidth = 7;
+        ctx.strokeStyle = "#9fc4de";
+        ctx.lineJoin = "round";
         ctx.stroke();
         trace(ctx, moving);
-        ctx.fillStyle = cos < 0 ? "#d7e8f5" : "#fffdf8";
         ctx.fill();
 
         var hits = creaseHits();

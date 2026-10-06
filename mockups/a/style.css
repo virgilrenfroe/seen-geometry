@@ -10,10 +10,11 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; overflow-x: hidden; }
 
 body {
   min-height: 100vh;
+  overflow-x: hidden;
   color: var(--ink);
   font-family: "Instrument Sans", "Helvetica Neue", sans-serif;
   background-color: var(--ground);
@@ -301,7 +302,7 @@ body.demo .deck { margin-top: 6px; max-width: 40rem; }
 .colophon a { color: var(--signal); }
 
 @media (max-width: 800px) {
-  .frame { margin: 10px; padding: 16px 12px 12px; outline-offset: 3px; }
+  .frame { margin: 10px; padding: 16px 12px 12px; outline-offset: 0; }
   .hero, body.demo .hero { max-width: none; }
   .protractor, .arc { display: none; }
   .bom { grid-template-columns: 1fr; gap: 0; margin-top: 18px; }
