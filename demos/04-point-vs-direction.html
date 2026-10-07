@@ -22,7 +22,7 @@
 <body class="demo">
   <header class="top">
     <a class="brand" href="../index.html">Seen Geometry</a>
-    <p class="eyebrow">04 · Point or direction</p>
+    <p class="eyebrow">04 · Point vs direction</p>
   </header>
   <div class="stage" id="stage">
     <canvas id="canvas" aria-label="Two copies of one arrow. The point moves when translated. The direction does not."></canvas>
@@ -33,8 +33,8 @@
   </div>
   <section class="dock" aria-label="Point and direction">
     <p class="index-no">04</p>
-    <h1>Point or direction</h1>
-    <p class="lede">One arrow uses one matrix. The point has w = 1. Translation moves its tip. The direction has w = 0. The same translation leaves the direction in place.</p>
+    <h1>Point vs direction</h1>
+    <p class="lede">A point has w = 1, so a translation moves it. A direction has w = 0, so the same translation leaves it in place.</p>
     <div class="orders" role="group" aria-label="Which arrow to show">
       <button type="button" data-focus="point" aria-pressed="false">Point w = 1</button>
       <button type="button" data-focus="dir" aria-pressed="false">Direction w = 0</button>
@@ -82,6 +82,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>A surface normal or a velocity is a direction. Translating it as if it were a point adds a shift that should not be there.</li>
+        <li>Dropping w treats a point and a direction as the same kind of vector.</li>
+        <li>Rotation still turns both arrows. A turn does not treat the point and the direction differently.</li>
+        <li>The rightmost column is the translation. A point adds that column. A direction multiplies it by zero.</li>
+      </ul>
+    </details>
     <p class="next"><a href="03-compose-transforms.html">Order of transforms</a> · <a href="05-shear.html">Next: shear</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

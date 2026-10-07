@@ -22,7 +22,7 @@
 <body class="demo">
   <header class="top">
     <a class="brand" href="../index.html">Seen Geometry</a>
-    <p class="eyebrow">06 · Determinant</p>
+    <p class="eyebrow">06 · Determinant and reflection</p>
   </header>
   <div class="stage" id="stage">
     <canvas id="canvas" aria-label="An F on the unit square. Drag the tips of i and j. A negative determinant mirrors the F."></canvas>
@@ -33,8 +33,8 @@
   </div>
   <section class="dock" aria-label="Determinant">
     <p class="index-no">06</p>
-    <h1>Determinant</h1>
-    <p class="lede">Drag the two tips. The red tip is i. The ink tip is j. The determinant is the signed area of the parallelogram.</p>
+    <h1>Determinant and reflection</h1>
+    <p class="lede">The determinant is the signed area of the parallelogram spanned by i and j. A negative determinant mirrors the shape, and zero flattens it onto a line.</p>
     <div class="orders" role="group" aria-label="Preset matrices">
       <button type="button" data-preset="id" aria-pressed="true">Identity</button>
       <button type="button" data-preset="reflect" aria-pressed="false">Reflect across Y</button>
@@ -71,6 +71,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>The sign matters. Reading only the absolute value misses the mirror.</li>
+        <li>A reflection has determinant −1, not 1. The F reads backwards.</li>
+        <li>A determinant of zero means the shape has fallen onto a line. That matrix has no inverse.</li>
+        <li>Swapping i and j changes the sign of the area.</li>
+      </ul>
+    </details>
     <p class="next"><a href="05-shear.html">Shear</a> · <a href="07-fold.html">Next: fold</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

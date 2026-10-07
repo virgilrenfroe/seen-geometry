@@ -34,8 +34,8 @@
   </div>
   <section class="dock" aria-label="Perspective">
     <p class="index-no">10</p>
-    <h1>Divide by w</h1>
-    <p class="lede">The eye sits in front of a sheet. The house stands behind the sheet. Slide the eye closer or farther. Where a ray meets the sheet, that point is the drawing.</p>
+    <h1>Perspective</h1>
+    <p class="lede">Perspective draws a point by dividing by w, which carries depth. A larger w makes a smaller image, and parallel edges that recede meet at a vanishing point.</p>
     <p id="blurb">Parallel edges that run away from you meet at one vanishing point. The vanishing point sits on the horizon, level with the eye. The matrix stays the same when the eye moves. This corner's depth changes, and that changes w.</p>
     <label class="field">
       <span>Eye distance <output id="dist-out">4.20</output></span>
@@ -74,6 +74,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>The matrix output is not the final picture. x, y, and z still have to be divided by w.</li>
+        <li>Moving the eye does not change the matrix. The matrix stays the same, and this corner's depth changes w.</li>
+        <li>Perspective is not an orthographic projection. A projection drops a direction. Perspective divides by depth.</li>
+        <li>A real lens can distort. This page is the pinhole picture, and it leaves that distortion out.</li>
+      </ul>
+    </details>
     <p class="next"><a href="09-projection.html">Projection</a> · <a href="11-inverse.html">Next: inverse</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

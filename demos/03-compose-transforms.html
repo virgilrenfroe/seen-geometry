@@ -29,8 +29,8 @@
   </div>
   <section class="dock" aria-label="Transform factors">
     <p class="index-no">03</p>
-    <h1>Order changes the picture</h1>
-    <p class="lede">The three numbers stay the same. The grid stays still. Only the product changes.</p>
+    <h1>Order of transforms</h1>
+    <p class="lede">The same translate, rotate, and scale can be multiplied in more than one order. Matrix products are read from right to left, so the rightmost matrix touches the point first.</p>
     <h2>Read the product from right to left</h2>
     <p>The rightmost matrix touches the point first. The dark dot is the origin. The origin does not move with the arrow.</p>
     <div class="orders" role="group" aria-label="Which product to show">
@@ -83,6 +83,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>Reading the product from left to right applies the moves in the wrong order.</li>
+        <li>A turn and then a slide is not the same as a slide and then a turn.</li>
+        <li>The dark dot is the origin. It does not move with the arrow.</li>
+        <li>The three slider numbers stay the same when only the order changes.</li>
+      </ul>
+    </details>
     <p class="next"><a href="02-morph-targets.html">Morph targets</a> · <a href="04-point-vs-direction.html">Next: point vs direction</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

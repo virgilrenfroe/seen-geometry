@@ -33,8 +33,8 @@
   </div>
   <section class="dock" aria-label="Eigenvectors">
     <p class="index-no">12</p>
-    <h1>Directions that stay</h1>
-    <p class="lede">Most arrows turn when the matrix acts. A few stay on their own line. Those directions only stretch or shrink. The stretch factor is λ.</p>
+    <h1>Eigenvectors</h1>
+    <p class="lede">An eigenvector stays on its own line when a matrix acts. It only stretches or shrinks, and the stretch factor is λ.</p>
     <div class="orders" role="group" aria-label="Example matrices">
       <button type="button" data-preset="stretch" aria-pressed="true">Stretch</button>
       <button type="button" data-preset="axes" aria-pressed="false">Axes</button>
@@ -85,6 +85,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>Most arrows are not eigenvectors. The ink arrows turn off their lines.</li>
+        <li>A pure turn has no real eigenvector. Every arrow leaves its line.</li>
+        <li>λ is the stretch along that line. It is not one of the four matrix entries by itself.</li>
+        <li>A negative λ flips the arrow along the same line. It does not send the arrow onto a new direction.</li>
+      </ul>
+    </details>
     <p class="next"><a href="11-inverse.html">Inverse</a> · <a href="../index.html">Lessons</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

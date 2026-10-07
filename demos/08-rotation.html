@@ -32,8 +32,8 @@
   </div>
   <section class="dock" aria-label="Rotation">
     <p class="index-no">08</p>
-    <h1>A turn</h1>
-    <p class="lede">Drag the point around the circle. The columns are i and j after the turn.</p>
+    <h1>Rotation</h1>
+    <p class="lede">A rotation turns the plane about the origin by an angle. The columns of the matrix are where i and j land, and the determinant stays 1.</p>
     <label class="check"><input id="folds" type="checkbox"> Two folds</label>
     <p id="blurb">The determinant stays 1. The mark turns. It does not flip.</p>
     <pre class="factors" id="factors"></pre>
@@ -68,6 +68,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>This matrix turns about the origin. A turn about some other point needs a slide, a rotation, and a slide back.</li>
+        <li>The matrix entries are the cosine and the sine of the angle, not the number of degrees.</li>
+        <li>A rotation does not change area. The determinant stays 1, and the mark does not flip.</li>
+        <li>Two folds make one turn. The turn is twice the angle between the creases.</li>
+      </ul>
+    </details>
     <p class="next"><a href="07-fold.html">Fold</a> · <a href="09-projection.html">Next: projection</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

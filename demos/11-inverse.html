@@ -33,8 +33,8 @@
   </div>
   <section class="dock" aria-label="Inverse">
     <p class="index-no">11</p>
-    <h1>Undo the matrix</h1>
-    <p class="lede">A matrix moves the F. Its inverse moves the F back. The product of a matrix and its inverse is the identity. The identity leaves every point where it was.</p>
+    <h1>Inverse</h1>
+    <p class="lede">The inverse of a matrix undoes that matrix, and their product is the identity. If the determinant is 0, there is no inverse.</p>
     <div class="orders" role="group" aria-label="Which matrix">
       <button type="button" data-kind="shear" aria-pressed="true">Shear</button>
       <button type="button" data-kind="turn" aria-pressed="false">Turn</button>
@@ -87,6 +87,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>Not every matrix has an inverse. A flatten has none, because the determinant is 0 and the lost direction does not come back.</li>
+        <li>The inverse is not the transpose, and it is not the matrix with the sign of every entry flipped.</li>
+        <li>When an inverse exists, the product either way is the identity. The slider on this page applies the matrix first, then the inverse.</li>
+        <li>The Hill cipher decrypts with an inverse. It is a teaching cipher from 1929, not a modern one.</li>
+      </ul>
+    </details>
     <p class="next"><a href="10-perspective.html">Perspective</a> · <a href="12-eigenvectors.html">Next: eigenvectors</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

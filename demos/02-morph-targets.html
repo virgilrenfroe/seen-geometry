@@ -30,8 +30,8 @@
   </div>
   <section class="dock" aria-label="Blend weights">
     <p class="index-no">02</p>
-    <h1>Two blend shapes</h1>
-    <p class="lede">The base shape is a sphere. Spike and squash move the same points. A slider sets a weight. Both weights can be on at once.</p>
+    <h1>Morph targets</h1>
+    <p class="lede">A morph target is a second shape for the same points. A weight blends the base toward spike or squash, and both weights can be on at once.</p>
     <h2>Weights</h2>
     <p>At 0 you see the base sphere. At 1 that shape is fully on. The two weights add together. Their sum can be more than 1.</p>
     <label class="field">
@@ -61,6 +61,14 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>The mesh is not replaced. Spike and squash move the same points on the base sphere.</li>
+        <li>The two weights do not have to sum to 1. Both can be on, and their sum can be more than 1.</li>
+        <li>A morph is not a matrix move. The points slide toward another shape of the same mesh.</li>
+      </ul>
+    </details>
     <p class="next"><a href="01-instanced-field.html">Instanced field</a> · <a href="03-compose-transforms.html">Next: order of transforms</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

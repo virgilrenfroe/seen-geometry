@@ -36,8 +36,8 @@
   </div>
   <section class="dock" aria-label="Selected matrix">
     <p class="index-no">01</p>
-    <h1>One shape, many matrices</h1>
-    <p class="lede">Each block is the same box. Only its matrix changes. Drag the picture to look around. The copies stay where their matrices put them.</p>
+    <h1>Instanced field</h1>
+    <p class="lede">Instancing draws one shape many times. Each copy has its own matrix for position, turn, and size.</p>
     <p>Look at Draw calls. The number stays at 1. The computer draws every copy in one pass. The copies share one shape. Only their matrices differ.</p>
     <h2 id="pick-title">Select a block</h2>
     <p id="pick-help">Click a block, or type its number. The rightmost column of the matrix is the position of that copy.</p>
@@ -73,6 +73,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>Each copy is not a new shape. The copies share one box, and only the matrix changes.</li>
+        <li>The rightmost column is the position of that copy. It is not the turn.</li>
+        <li>More copies do not add draw calls. This picture stays at one draw call.</li>
+        <li>Color shows height. Color is not stored in the matrix.</li>
+      </ul>
+    </details>
     <p class="next"><a href="02-morph-targets.html">Next: morph targets</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

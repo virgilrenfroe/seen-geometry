@@ -33,7 +33,7 @@
   <section class="dock" aria-label="Shear">
     <p class="index-no">05</p>
     <h1>Shear</h1>
-    <p class="lede">Slide one side of the square. The area stays the same. The corner angle changes.</p>
+    <p class="lede">A shear slides one axis by a multiple of the other. The area of the unit square stays 1, and the corner angle changes.</p>
     <div class="orders" role="group" aria-label="Shear direction">
       <button type="button" data-axis="x" aria-pressed="true">Along X</button>
       <button type="button" data-axis="y" aria-pressed="false">Along Y</button>
@@ -70,6 +70,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>A shear does not change the area. The absolute value of the determinant stays 1.</li>
+        <li>A shear is not a rotation. The right angle is lost, and the slanted side grows longer.</li>
+        <li>An oblique letter is a sheared upright. A true italic is usually drawn again, not only sheared.</li>
+        <li>In geology, shear is a related idea. The matrix on this page is the slide, not that full model.</li>
+      </ul>
+    </details>
     <p class="next"><a href="04-point-vs-direction.html">Point vs direction</a> · <a href="06-determinant.html">Next: determinant</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">

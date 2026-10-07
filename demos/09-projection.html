@@ -34,8 +34,8 @@
   </div>
   <section class="dock" aria-label="Projection">
     <p class="index-no">09</p>
-    <h1>Flatten onto a plane</h1>
-    <p class="lede">Lines drop from each corner of the house onto the plane. The red drawing is the flat view. It keeps two directions and loses the third.</p>
+    <h1>Projection</h1>
+    <p class="lede">A projection flattens space onto a plane and drops one direction. The flat view of the house cannot be undone, and the determinant stays 0.</p>
     <div class="orders" role="group" aria-label="View">
       <button type="button" data-view="top" aria-pressed="true">Top</button>
       <button type="button" data-view="front" aria-pressed="false">Front</button>
@@ -78,6 +78,15 @@
         document.currentScript.previousElementSibling.open = true;
       }
     </script>
+    <details class="used">
+      <summary>Common mistakes</summary>
+      <ul>
+        <li>The lost coordinate does not come back. A determinant of 0 means this flatten has no inverse.</li>
+        <li>A projection is not a perspective drawing. Perspective divides by w. This view only drops a direction.</li>
+        <li>Tilting the plane still leaves the determinant at 0.</li>
+        <li>A shadow map and a map projection are related ideas. They are not this matrix.</li>
+      </ul>
+    </details>
     <p class="next"><a href="08-rotation.html">Rotation</a> · <a href="10-perspective.html">Next: perspective</a></p>
   </section>
   <nav class="reelbar" aria-label="Lessons">
